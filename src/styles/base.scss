@@ -1,0 +1,36 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  color: $text-color;
+  line-height: $line-height-base;
+  user-select: none;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  background-image: linear-gradient(to top, $bg-start 0%, $bg-end 100%);
+  overflow: hidden;
+}
+
+body,
+#app {
+  height: 100vh;
+}
+
+input {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  width: 0;
+  border: none;
+  outline: none;
+}
