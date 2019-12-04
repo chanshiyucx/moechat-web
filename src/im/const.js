@@ -13,7 +13,9 @@ export const CMD = {
   LOGIN_REQUEST: 3, // 登录请求
   LOGIN_RESPONSE: 4, // 登录响应
   MESSAGE_REQUEST: 5, // 发送消息
-  MESSAGE_RESPONSE: 6 // 响应消息
+  MESSAGE_RESPONSE: 6, // 响应消息
+  ACCEPT_MESSAGE_RESPONSE: 7, // 接收消息
+  ONLINE_USER_RESPONSE: 8 // 在线列表
 }
 
 /**
