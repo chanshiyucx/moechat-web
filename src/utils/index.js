@@ -49,7 +49,7 @@ export const formatHtml = (arr, TYPES) => {
           text: msg
         })
       } else {
-        data[data.length - 1].text = data[data.length - 1].text + msg
+        data[data.length - 1].text = data[data.length - 1].text + `<br/>` + msg
       }
     }
   })

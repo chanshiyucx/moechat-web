@@ -15,33 +15,32 @@
             <span class="l-login_textfield">
               <label>
                 <i class="icon icon-user"></i>
-                用户名
               </label>
-              <input type="text" v-model="userForm.username" />
+              <input type="text" placeholder="用户名" v-model="userForm.username" />
             </span>
             <span v-if="userFormType === 'register'" class="l-login_textfield">
               <label>
                 <i class="icon icon-emo-devil"></i>
-                昵称
               </label>
-              <input type="text" v-model="userForm.nickname" />
+              <input type="text" placeholder="昵称" v-model="userForm.nickname" />
             </span>
             <span class="l-login_textfield">
               <label>
                 <i class="icon icon-lock"></i>
-                密码
               </label>
-              <input type="text" v-model="userForm.password" />
+              <input type="text" placeholder="密码" v-model="userForm.password" />
             </span>
             <span v-if="userFormType === 'register'" class="l-login_textfield">
               <label>
                 <i class="icon icon-lock"></i>
-                确认密码
               </label>
-              <input type="text" v-model="userForm.rePassword" />
+              <input type="text" placeholder="确认密码" v-model="userForm.rePassword" />
             </span>
           </div>
-          <div class="l-login_error">{{ userFormError }}</div>
+          <div class="l-login_error" v-if="userFormError">
+            <i class="icon icon-attention-alt"></i>
+            {{ userFormError }}
+          </div>
           <div class="l-login_option">
             <div @click="handleSwitch">
               <i class="icon icon-left-open-outline"></i>
@@ -84,7 +83,6 @@
                         class="l-preview-img"
                         :src="item.msg.url"
                         :width="item.msg.width"
-                        :height="item.msg.height"
                       />
                     </div>
                   </div>
@@ -182,7 +180,7 @@ export default {
     const inputArea = document.getElementById('inputArea')
     inputArea.onkeydown = event => {
       const e = event || window.event
-      if (e.keyCode === 13) {
+      if (e.keyCode === 13 && e.ctrlKey) {
         e.preventDefault()
         this.handleSendMsg()
       }
@@ -518,14 +516,16 @@ export default {
           margin-bottom: 0;
         }
         label {
-          margin-right: 10px;
-          width: 76px;
+          width: 20px;
         }
         label i {
           width: 14px;
         }
         input {
           background-color: transparent;
+          &::placeholder {
+            padding-left: 2px;
+          }
         }
       }
     }
@@ -641,6 +641,9 @@ export default {
           font-size: $font-size-small;
         }
         .l-preview-img {
+          cursor: pointer;
+          display: block;
+          margin: 4px 0;
           max-width: 300px;
           border-radius: 5px;
           overflow: hidden;
@@ -755,8 +758,9 @@ export default {
     }
     .l-input-area {
       padding: 5px 10px;
-      height: 100%;
+      height: 124px;
       outline: none;
+      overflow: auto;
       @include scrollBar;
     }
   }
