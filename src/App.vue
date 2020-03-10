@@ -62,13 +62,14 @@
       </div>
       <div class="right">
         <div ref="chat" class="l-chat">
-          <div class="l-history">
+          <div v-if="imInfo" class="l-history">
             <div v-if="state.history === 0">
-              <img src="@/assets/images/loading.png" width="18" height="18" alt />
+              <img :src="loadingImg" width="18" height="18" alt />
             </div>
             <div v-else-if="state.history === 1" @click="getHistory">------------拉取历史消息------------</div>
             <div v-else>------------暂无历史消息------------</div>
           </div>
+          <img class="l-kawaii" v-else :src="kawaiiImg" width="71" height="97" alt />
           <ul ref="chatList">
             <li v-for="(item, index) in chatMsgList" :key="index">
               <div :class="['l-msg', userInfo && item.userId === userInfo.id ? 'l-me' : 'l-user']">
@@ -141,10 +142,13 @@ export default {
   data() {
     return {
       loadingImg: require('@/assets/images/loading.gif'),
+      kawaiiImg: require('@/assets/images/kawaii.gif'),
       ImSocket: null,
-      userInfo: localUser ? JSON.parse(localUser) : null,
       imInfo: null,
+      userInfo: localUser ? JSON.parse(localUser) : null,
       TYPES,
+      emoji,
+      emojiList: [],
       visible: {
         mask: true,
         emoji: false
@@ -153,8 +157,6 @@ export default {
         scrollTop: 0, // 0: 滚动到顶部 1: 滚动到底部 2: 不做任何处理
         history: 0 // 0: 正在拉取 1: 拉取历史消息 2: 暂无历史消息
       },
-      emoji,
-      emojiList: [],
       chatMsgList: [],
       onlineUserList: [],
       userFormType: 'login',
@@ -469,6 +471,7 @@ export default {
     flex-direction: column;
     padding: 6px 14px;
     img {
+      cursor: pointer;
       position: absolute;
       right: 40px;
       top: 10px;
@@ -478,6 +481,12 @@ export default {
       text-align: center;
       box-shadow: $chat-shadow;
       border: 4px solid $chat-bg;
+      transition: transform 1s ease-out;
+
+      &:hover {
+        animation-play-state: paused;
+        transform: rotateZ(360deg);
+      }
     }
     > span {
       display: flex;
@@ -574,6 +583,7 @@ export default {
   }
 
   .l-chat {
+    position: relative;
     height: 440px;
     border-bottom: 1px solid #ddd;
     overflow-y: auto;
@@ -584,6 +594,14 @@ export default {
       height: 40px;
       line-height: 40px;
       text-align: center;
+    }
+
+    .l-kawaii {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      opacity: 0.8;
+      transform: translate(-50%, -50%);
     }
 
     ul {
