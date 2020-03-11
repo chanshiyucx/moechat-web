@@ -3,12 +3,12 @@
     <div id="chat">
       <div class="left">
         <div v-if="userInfo" class="l-info">
-          <img @click="visible.avatar = true" :src="getRandomAvatar(userInfo.id)" alt />
+          <img @click="visible.avatar = true" :src="userInfo.avatar || getRandomAvatar(userInfo.id)" alt />
           <span>ID：{{ userInfo.id }}</span>
           <span>用户名：{{ userInfo.username }}</span>
           <span>昵称：{{ userInfo.nickname }}</span>
           <span>注册时间：{{ userInfo.createTime }}</span>
-          <span>在线人数：{{ onlineUserList.length }}</span>
+          <span>在线人数：{{ onlineUserList.length - 1 }}</span>
         </div>
         <div v-else class="l-login">
           <div class="l-login_form">
@@ -53,19 +53,25 @@
           </div>
         </div>
         <ul class="l-list">
-          <li v-for="(item, index) in onlineUserList" :key="`${item.id}-${index}`">
-            <img :src="getRandomAvatar(item.id)" alt />
+          <li
+            v-for="(item, index) in filterOnlineUserList"
+            :key="`${item.id}-${index}`"
+            @click="accept = item"
+            :class="accept && accept.id === item.id ? 'active' : ''"
+          >
+            <img :src="item.avatar || getRandomAvatar(item.id)" alt />
             <span>{{ item.nickname }}</span>
+            <sup v-if="item.unReadCount">{{ item.unReadCount }}</sup>
           </li>
         </ul>
       </div>
       <div class="right">
         <div ref="chat" class="l-chat">
-          <div v-if="imInfo" class="l-history">
+          <div v-if="imInfo || accept" class="l-history">
             <div v-if="state.history === 0">
               <img :src="loadingImg" width="18" height="18" alt />
             </div>
-            <div v-else-if="state.history === 1" @click="getHistory">------------拉取历史消息------------</div>
+            <div v-else-if="state.history === 1" @click="getHistory(false)">------------拉取历史消息------------</div>
             <div v-else>------------暂无历史消息------------</div>
           </div>
           <img class="l-kawaii" v-else :src="kawaiiImg" width="71" height="97" alt />
@@ -73,7 +79,7 @@
             <li v-for="(item, index) in chatMsgList" :key="index">
               <div :class="['l-msg', userInfo && item.userId === userInfo.id ? 'l-me' : 'l-user']">
                 <div class="l-msg-wapper">
-                  <img class="l-avatar" :src="getRandomAvatar(item.userId)" alt />
+                  <img class="l-avatar" :src="item.avatar || getRandomAvatar(item.userId)" alt />
                   <div class="l-content">
                     <span class="l-nickname">{{ item.userNickname }}</span>
                     <div :class="['l-content-wrapper', item.state === 0 && 'l-content-wrapper-loading']">
@@ -92,7 +98,7 @@
           </ul>
         </div>
         <div class="l-input">
-          <div v-show="visible.mask" class="l-input-mask" />
+          <div v-show="visible.mask || !accept" class="l-input-mask" />
           <div class="l-input-tool">
             <div v-show="visible.emoji" class="l-emoji">
               <span v-for="item in emojiList" :key="item.name" @click="handleEmoji(item)">
@@ -116,7 +122,20 @@
             </ul>
           </div>
           <div id="inputArea" ref="inputArea" class="l-input-area" contenteditable="true" />
-          <div class="l-input-send" @click="handleSendMsg">发送</div>
+          <div class="l-input-send" @click="handleSendMsg">
+            发送
+            <i @click="visible.sendType = !visible.sendType" :class="['icon', visible.sendType ? 'icon-up-open' : 'icon-down-open']" />
+          </div>
+          <div v-if="visible.sendType" class="l-input-send-select">
+            <span @click="changeSendType(0)">
+              <i :class="['icon', 'icon-ok-outline', sendType === 0 && 'show']" />
+              按 Enter 键发送消息
+            </span>
+            <span @click="changeSendType(1)">
+              <i :class="['icon', 'icon-ok-outline', sendType === 1 && 'show']" />
+              按 Ctrl + Enter 键发送消息
+            </span>
+          </div>
         </div>
         <!-- 头像上传 -->
         <AvatarUpload
@@ -149,6 +168,7 @@ import { validateUsername, validateNickname, validatePassword } from '@/utils/va
 const apiUrl = 'https://api.imgur.com/3/image'
 const apiKey = '4433d0ee1f85168'
 const localUser = localRead('userInfo')
+const sendType = localRead('sendType')
 
 export default {
   name: 'app',
@@ -171,12 +191,15 @@ export default {
       visible: {
         mask: true,
         emoji: false,
-        avatar: false
+        avatar: false,
+        sendType: false
       },
       state: {
         scrollTop: 0, // 0: 滚动到顶部 1: 滚动到底部 2: 不做任何处理
         history: 0 // 0: 正在拉取 1: 拉取历史消息 2: 暂无历史消息
       },
+      sendType: +sendType || 0, // 0 发送 1 换行
+      chatMsgCache: {},
       chatMsgList: [],
       onlineUserList: [],
       userFormType: 'login',
@@ -187,7 +210,39 @@ export default {
         rePassword: ''
       },
       userFormError: '',
-      inx: 0
+      inx: 0,
+      accept: null
+    }
+  },
+  computed: {
+    filterOnlineUserList() {
+      return this.onlineUserList.filter(o => o.id !== this.userInfo.id)
+    }
+  },
+  watch: {
+    accept: {
+      immediate: true,
+      handler(val, oldVal) {
+        if (oldVal) {
+          this.chatMsgCache[oldVal.id] = this.chatList || []
+        }
+        if (val) {
+          const target = this.onlineUserList.find(o => o.id === val.id)
+          this.$set(target, 'unReadCount', 0)
+          this.chatMsgList = this.chatMsgCache[val.id] || []
+          this.getHistory(true)
+        } else {
+          this.chatMsgList = []
+        }
+      }
+    },
+    chatMsgList: {
+      deep: true,
+      handler() {
+        this.$nextTick(() => {
+          this.handleScroll()
+        })
+      }
     }
   },
   mounted() {
@@ -202,21 +257,15 @@ export default {
     const inputArea = document.getElementById('inputArea')
     inputArea.onkeydown = event => {
       const e = event || window.event
-      if (e.keyCode === 13 && e.ctrlKey) {
-        e.preventDefault()
-        this.handleSendMsg()
+      if (e.keyCode === 13) {
+        // 如果是直接发送或者组合键
+        if (this.sendType === 0 || (this.sendType === 1 && e.ctrlKey)) {
+          e.preventDefault()
+          this.handleSendMsg()
+        }
       }
     }
-  },
-  watch: {
-    chatMsgList: {
-      deep: true,
-      handler() {
-        this.$nextTick(() => {
-          this.handleScroll()
-        })
-      }
-    }
+    inputArea.onclick = () => (this.visible.sendType = false)
   },
   methods: {
     init() {
@@ -240,10 +289,7 @@ export default {
       this.linkStart()
     },
     linkStart() {
-      // IM 登录
       this.handleLogin()
-      // 获取聊天记录
-      this.getHistory()
     },
     linkSuccess(data) {
       if (data.success) {
@@ -257,11 +303,12 @@ export default {
       const data = { id, username, nickname }
       this.handleRequestEvent('login', data)
     },
-    async getHistory() {
-      this.state.scrollTop = 0
+    async getHistory(init) {
+      this.state.scrollTop = init ? 1 : 0
       this.state.history = 0
       const lastMsg = this.chatMsgList[0]
-      const req = { lastMsgId: lastMsg && lastMsg.id ? lastMsg.id : 0 }
+      const lastMsgId = init ? 0 : lastMsg && lastMsg.id ? lastMsg.id : 0
+      const req = { lastMsgId, userId: this.userInfo.id, acceptId: this.accept.id }
       const res = await request({
         url: '/chat/msg',
         method: 'GET',
@@ -303,7 +350,7 @@ export default {
           data: req
         })
         this.userInfo = res.data
-        localSave('userInfo', JSON.stringify(res.data))
+        localSave('userInfo', JSON.stringify(this.userInfo))
         this.handleLogin()
       } catch (error) {
         this.userFormError = error.response.data.message
@@ -313,6 +360,7 @@ export default {
       return `http://www.gravatar.com/avatar/${id}?s=256&d=identicon`
     },
     handleSendMsg() {
+      if (!this.accept) return
       this.state.scrollTop = 1
       const sendMsgNodes = this.$refs.inputArea.childNodes
       const res = formatHtml(sendMsgNodes, TYPES)
@@ -324,10 +372,10 @@ export default {
     },
     sendMsgTask(msg) {
       const inx = ++this.inx
-      const data = { inx, msg: JSON.stringify(msg) }
+      const data = { inx, msg: JSON.stringify(msg), acceptId: this.accept.id }
       this.handleRequestEvent('sendMsg', data)
-      const { id, nickname } = this.userInfo
-      const chatMsg = { inx, msg, createTime: new Date(), state: 0, userNickname: nickname, userId: id }
+      const { id, nickname, avatar } = this.userInfo
+      const chatMsg = { inx, msg, createTime: new Date(), state: 0, userNickname: nickname, userId: id, avatar }
       this.chatMsgList.push(chatMsg)
     },
     sendMsgSuccess(data) {
@@ -343,7 +391,19 @@ export default {
       } catch (error) {
         console.log('消息转换失败')
       }
-      this.chatMsgList.push(data)
+      if (data.acceptId === 0) {
+        if (this.accept.id === 0) {
+          this.chatMsgList.push(data)
+        } else {
+          const target = this.onlineUserList.find(o => o.id === data.acceptId)
+          this.$set(target, 'unReadCount', target.unReadCount ? target.unReadCount + 1 : 1)
+        }
+      } else if (this.accept.id === data.userId) {
+        this.chatMsgList.push(data)
+      } else {
+        const target = this.onlineUserList.find(o => o.id === data.userId)
+        this.$set(target, 'unReadCount', target.unReadCount ? target.unReadCount + 1 : 1)
+      }
     },
     toHtml(text) {
       const str = text
@@ -404,9 +464,12 @@ export default {
       }
       this.state.scrollTop = 2
     },
+    handleOnlineUserList(data) {
+      this.onlineUserList = data.userList
+      if (!this.accept) this.accept = data.userList[0]
+    },
     cropSuccess(imgDataUrl, field) {
       console.log('-------- crop success --------')
-      console.log('imgDataUrl', imgDataUrl)
     },
     cropUploadSuccess(jsonData, field) {
       console.log('-------- upload success --------')
@@ -425,9 +488,16 @@ export default {
           method: 'POST',
           data: req
         })
+        localSave('userInfo', JSON.stringify(this.userInfo))
+        this.visible.avatar = false
+        this.$toasted.show('信息更新成功！')
       } catch (error) {
         console.log(error)
       }
+    },
+    changeSendType(type) {
+      this.sendType = type
+      localSave('sendType', type)
     },
     /**
      * 统一处理数据请求逻辑 【工作台 ===》IM】
@@ -462,7 +532,7 @@ export default {
           this.linkSuccess(data)
           break
         case CMD.ONLINE_USER_RESPONSE: // 在线列表
-          this.onlineUserList = data.userList
+          this.handleOnlineUserList(data)
           break
         case CMD.MESSAGE_RESPONSE: // 发送消息成功
           this.sendMsgSuccess(data)
@@ -500,6 +570,11 @@ export default {
   .left {
     width: 260px;
     background-color: $chat-bg;
+    background-image: $reimu-bg;
+    background-size: 260px;
+    background-position: bottom right;
+    background-repeat: no-repeat;
+    background-blend-mode: overlay;
   }
   .right {
     display: flex;
@@ -606,10 +681,15 @@ export default {
     margin: 12px;
     @include scrollBar;
     li {
+      cursor: pointer;
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       margin: 0 6px 8px;
+      &.active {
+        background-color: #fcc;
+      }
       img {
         display: inline-block;
         margin-bottom: 2px;
@@ -621,6 +701,19 @@ export default {
       }
       span {
         font-size: $font-size-small;
+      }
+      sup {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #f56c6c;
+        display: inline-block;
+        padding: 0 6px;
+        color: $whitesmoke;
+        font-size: $font-size-small;
+        text-align: center;
+        white-space: nowrap;
+        border-radius: 10px;
       }
     }
   }
@@ -784,12 +877,21 @@ export default {
         }
       }
     }
+    .l-input-area {
+      padding: 5px 10px;
+      height: 124px;
+      outline: none;
+      overflow: auto;
+      @include scrollBar;
+    }
+
     .l-input-send {
       cursor: pointer;
       position: absolute;
       right: 16px;
       bottom: 14px;
-      width: 70px;
+      padding: 0 6px 0 10px;
+      width: 74px;
       height: 30px;
       line-height: 30px;
       letter-spacing: 3px;
@@ -799,12 +901,29 @@ export default {
       box-shadow: $bottom-shadow;
       background-color: $purple-dim;
     }
-    .l-input-area {
-      padding: 5px 10px;
-      height: 124px;
-      outline: none;
-      overflow: auto;
-      @include scrollBar;
+    .l-input-send-select {
+      position: absolute;
+      bottom: 56px;
+      right: 16px;
+      padding: 0 10px;
+      width: 184px;
+      height: 56px;
+      text-align: left;
+      font-size: $font-size-small;
+      border-radius: 3px;
+      background-color: white;
+      box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.1);
+      i {
+        opacity: 0;
+        &.show {
+          opacity: 1;
+        }
+      }
+      > span {
+        display: block;
+        height: 28px;
+        line-height: 28px;
+      }
     }
   }
 }
