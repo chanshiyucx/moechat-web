@@ -3,7 +3,7 @@
     <div id="chat">
       <div class="left">
         <div v-if="userInfo" class="l-info">
-          <img :src="getRandomAvatar(userInfo.id)" alt />
+          <img @click="visible.avatar = true" :src="getRandomAvatar(userInfo.id)" alt />
           <span>ID：{{ userInfo.id }}</span>
           <span>用户名：{{ userInfo.username }}</span>
           <span>昵称：{{ userInfo.nickname }}</span>
@@ -28,13 +28,13 @@
               <label>
                 <i class="icon icon-lock"></i>
               </label>
-              <input type="text" placeholder="密码" v-model="userForm.password" />
+              <input type="password" placeholder="密码" v-model="userForm.password" />
             </span>
             <span v-if="userFormType === 'register'" class="l-login_textfield">
               <label>
                 <i class="icon icon-lock"></i>
               </label>
-              <input type="text" placeholder="确认密码" v-model="userForm.rePassword" />
+              <input type="password" placeholder="确认密码" v-model="userForm.rePassword" />
             </span>
           </div>
           <div class="l-login_error" v-if="userFormError">
@@ -118,12 +118,26 @@
           <div id="inputArea" ref="inputArea" class="l-input-area" contenteditable="true" />
           <div class="l-input-send" @click="handleSendMsg">发送</div>
         </div>
+        <!-- 头像上传 -->
+        <AvatarUpload
+          v-model="visible.avatar"
+          field="image"
+          :url="apiUrl"
+          :width="300"
+          :height="300"
+          :headers="headers"
+          img-format="png"
+          @crop-success="cropSuccess"
+          @crop-upload-success="cropUploadSuccess"
+          @crop-upload-fail="cropUploadFail"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import AvatarUpload from 'vue-image-crop-upload'
 import LazyImg from '@/components/LazyImg'
 import IM, { CMD, TYPES } from '@/im'
 import config from '@/config'
@@ -132,13 +146,20 @@ import { localSave, localRead, formatHtml } from '@/utils'
 import request from '@/utils/request'
 import { validateUsername, validateNickname, validatePassword } from '@/utils/validate'
 
+const apiUrl = 'https://api.imgur.com/3/image'
+const apiKey = '4433d0ee1f85168'
 const localUser = localRead('userInfo')
 
 export default {
   name: 'app',
-  components: { LazyImg },
+  components: { AvatarUpload, LazyImg },
   data() {
     return {
+      apiUrl,
+      apiKey,
+      headers: {
+        Authorization: `Client-ID ${apiKey}`
+      },
       loadingImg: require('@/assets/images/loading.gif'),
       kawaiiImg: require('@/assets/images/kawaii.gif'),
       ImSocket: null,
@@ -149,7 +170,8 @@ export default {
       emojiList: [],
       visible: {
         mask: true,
-        emoji: false
+        emoji: false,
+        avatar: false
       },
       state: {
         scrollTop: 0, // 0: 滚动到顶部 1: 滚动到底部 2: 不做任何处理
@@ -357,15 +379,11 @@ export default {
       inputArea.append(img)
       img.src = this.loadingImg
 
-      const apiUrl = 'https://api.imgur.com/3/image'
-      const apiKey = '4433d0ee1f85168'
       const req = new FormData()
       req.append('image', file)
       const res = await fetch(apiUrl, {
         method: 'POST',
-        headers: {
-          Authorization: `Client-ID ${apiKey}`
-        },
+        headers,
         body: req
       })
       const data = await res.json()
@@ -385,6 +403,31 @@ export default {
         this.$refs.chat.scrollTop = scrollHeight + 200
       }
       this.state.scrollTop = 2
+    },
+    cropSuccess(imgDataUrl, field) {
+      console.log('-------- crop success --------')
+      console.log('imgDataUrl', imgDataUrl)
+    },
+    cropUploadSuccess(jsonData, field) {
+      console.log('-------- upload success --------')
+      this.userInfo.avatar = jsonData.data.link
+      this.updateUserInfo()
+    },
+    cropUploadFail(status, field) {
+      console.log('-------- upload fail --------')
+    },
+    async updateUserInfo() {
+      const { id, username, nickname, avatar } = this.userInfo
+      const req = { id, username, nickname, avatar }
+      try {
+        const res = await request({
+          url: '/account/update',
+          method: 'POST',
+          data: req
+        })
+      } catch (error) {
+        console.log(error)
+      }
     },
     /**
      * 统一处理数据请求逻辑 【工作台 ===》IM】
