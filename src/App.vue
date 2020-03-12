@@ -8,7 +8,7 @@
           <span>用户名：{{ userInfo.username }}</span>
           <span>昵称：{{ userInfo.nickname }}</span>
           <span>注册时间：{{ userInfo.createTime }}</span>
-          <span>在线人数：{{ onlineUserList.length - 1 }}</span>
+          <span>在线人数：{{ Math.max(onlineUserList.length - 1, 0) }}</span>
         </div>
         <div v-else class="l-login">
           <div class="l-login_form">
@@ -161,7 +161,7 @@ import LazyImg from '@/components/LazyImg'
 import IM, { CMD, TYPES } from '@/im'
 import config from '@/config'
 import emoji from '@/assets/emoji.json'
-import { localSave, localRead, formatHtml } from '@/utils'
+import { localSave, localRead, formatHtml, scrollTo } from '@/utils'
 import request from '@/utils/request'
 import { validateUsername, validateNickname, validatePassword } from '@/utils/validate'
 
@@ -310,7 +310,7 @@ export default {
       const lastMsgId = init ? 0 : lastMsg && lastMsg.id ? lastMsg.id : 0
       const req = { lastMsgId, userId: this.userInfo.id, acceptId: this.accept.id }
       const res = await request({
-        url: '/chat/msg',
+        url: '/msg/list',
         method: 'GET',
         params: req
       })
@@ -320,7 +320,11 @@ export default {
       } catch (error) {
         console.log('消息转换失败')
       }
-      this.chatMsgList = data.reverse().concat(this.chatMsgList)
+      const seen = new Map()
+      this.chatMsgList = data
+        .reverse()
+        .concat(this.chatMsgList)
+        .filter(o => !seen.has(o.id) && seen.set(o.id, 1))
       const { pageNum, pageSize, total } = attributes
       this.state.history = pageSize < total ? 1 : 2 // 1: 拉取历史消息 2: 暂无历史消息
     },
@@ -458,11 +462,11 @@ export default {
       const scrollTop = this.$refs.chat.scrollTop
       const scrollHeight = this.$refs.chatList.scrollHeight
       if (this.state.scrollTop === 0) {
-        this.$refs.chat.scrollTop = 0
+        scrollTo(this.$refs.chat, scrollTop, 0, 800)
       } else if (this.state.scrollTop === 1 || height + scrollTop >= scrollHeight - 200) {
-        this.$refs.chat.scrollTop = scrollHeight + 200
+        scrollTo(this.$refs.chat, scrollTop, scrollHeight + 200, 800)
       }
-      this.state.scrollTop = 2
+      // this.state.scrollTop = 2
     },
     handleOnlineUserList(data) {
       this.onlineUserList = data.userList
@@ -589,7 +593,7 @@ export default {
     img {
       cursor: pointer;
       position: absolute;
-      right: 40px;
+      right: 30px;
       top: 10px;
       width: 56px;
       height: 56px;
@@ -686,9 +690,13 @@ export default {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 0 6px 8px;
+      margin: 0 4px 4px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      border: 2px solid transparent;
       &.active {
-        background-color: #fcc;
+        border-color: $purple-dark;
+        background-color: rgba(184, 84, 200, 0.1);
       }
       img {
         display: inline-block;

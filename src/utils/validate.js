@@ -9,10 +9,10 @@ export const validateUsername = username => {
 }
 
 export const validateNickname = nickname => {
-  if (!/^[a-zA-Z0-9\u4e00-\u9fa5]{4,12}$/.test(nickname)) {
+  if (!/^[a-zA-Z0-9\u4e00-\u9fa5]{1,12}$/.test(nickname)) {
     return {
       valid: false,
-      message: '昵称必须为4-12位数字字母或中文'
+      message: '昵称必须为不长于12位数字字母或中文'
     }
   }
   return { valid: true, message: 'ok' }
