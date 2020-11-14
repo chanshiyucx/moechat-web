@@ -1,0 +1,59 @@
+// Colors
+// colors for theme.
+// --------------------------------------------------
+$black-light: #444;
+$purple: #d68fe9;
+$purple-dark: #b28fce;
+$purple-dim: #986db2;
+
+// Scaffolding
+// Settings for some of the most global styles.
+// --------------------------------------------------
+
+// Global text color on <body>
+$text-color: $black-light;
+
+// Global link color.
+$link-color: $purple-deep;
+
+// Selection
+$selection-bg: $purple;
+$selection-color: white;
+
+// Typography
+// Font, line-height, and elements colors.
+// --------------------------------------------------
+
+// Font families.
+$font-family-base: "Fira Mono", "Noto Serif SC", -apple-system, Roboto,
+  Helvetica Neue, sans-serif;
+
+// Font Weight
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+
+// Font size
+$font-size-base: 14px;
+$font-size-icon: 24px;
+$font-size-code: $font-size-base - 1px;
+$font-size-normal: $font-size-base + 1px;
+$font-size-small: $font-size-base - 2px;
+$font-size-large: $font-size-base + 2px;
+$font-size-smaller: $font-size-base - 4px;
+$font-size-larger: $font-size-base + 4px;
+
+// Global line height
+$line-height-base: 1.6;
+$line-height-block: 1.8;
+
+// Z-index master list
+// --------------------------------------------------
+$zindex-bottom: -1;
+$zindex-1: 1;
+$zindex-2: 10;
+$zindex-3: 100;
+$zindex-4: 1000;
+
+// Layout sizes
+// --------------------------------------------------
+$page-desktop: 876px;

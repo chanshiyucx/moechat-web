@@ -1,0 +1,46 @@
+@mixin scrollBar {
+  &::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background-color: $purple-dark;
+    background-image: -webkit-linear-gradient(
+      45deg,
+      $bg-white 25%,
+      transparent 25%,
+      transparent 50%,
+      $bg-white 50%,
+      $bg-white 75%,
+      transparent 75%,
+      transparent
+    );
+  }
+}
+
+@mixin pc-layout {
+  @media screen and (min-width: 768px) {
+    @content;
+  }
+}
+
+@mixin sp-layout {
+  @media screen and (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin cursor {
+  cursor: url("../assets/cursor/cursor.png"), auto !important;
+}
+
+@mixin cursor-link {
+  cursor: url("../assets/cursor/cursor_link.png"), auto !important;
+}

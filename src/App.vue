@@ -1,28 +1,54 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <button @click="login">登录</button>
+    <button @click="close">断开</button>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import IM, { CMD } from '@/IM'
+import config from './config'
 
 export default {
-  name: "App",
-  components: {
-    HelloWorld
+  name: 'App',
+  data() {
+    return {
+      ImSocket: null
+    }
+  },
+  created() {
+    this.init()
+  },
+  methods: {
+    init() {
+      this.ImSocket = new IM({
+        url: config.imURL,
+        onconnect: this.onconnect, // 服务器连接成功
+        ondisconnect: () => {}, // 服务器已断开连接
+        onerror: () => {}, // 服务器连接发生错误
+        handleResponseEvent: this.handleResponseEvent // 消息业务处理
+      })
+    },
+    onconnect() {},
+    login() {
+      const msg = {
+        command: CMD.LOGIN_REQUEST,
+        data: {
+          username: 'shiyu',
+          password: '124'
+        }
+      }
+      this.handleRequestEvent(msg)
+    },
+    close() {
+      this.ImSocket.closeSocket()
+    },
+    handleRequestEvent(msg) {
+      this.ImSocket.handleRequestEvent(msg)
+    },
+    handleResponseEvent(msg) {
+      console.log('msg========', msg)
+    }
   }
-};
-</script>
-
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
-</style>
+</script>

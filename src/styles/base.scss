@@ -1,0 +1,67 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+::selection {
+  background: $selection-bg;
+  color: $selection-color;
+}
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  color: $text-color;
+  line-height: $line-height-base;
+  user-select: none;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  @include cursor;
+  @include scrollBar;
+  @include pc-layout {
+    // 该属性值在移动设备上会造成比较明显的性能问题
+    // 详见 https://developer.mozilla.org/zh-CN/docs/Web/CSS/text-rendering
+    text-rendering: optimizeLegibility;
+  }
+}
+
+#app {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+img {
+  display: block;
+  margin: auto;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+  word-wrap: break-word;
+}
+
+button {
+  outline: none;
+}
+
+a,
+button,
+.cursor {
+  @include cursor-link;
+}
+
+input,
+textarea,
+button {
+  appearance: none;
+  border: none;
+  border-radius: 0;
+}
