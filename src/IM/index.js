@@ -64,8 +64,8 @@ export default class IM {
   }
 
   // 接收消息
-  _onmessage(event) {
-    const msg = decodeMsg(event.data)
+  async _onmessage(event) {
+    const msg = await decodeMsg(event.data)
     this.handleResponseEvent(msg)
   }
 

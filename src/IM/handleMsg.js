@@ -20,24 +20,26 @@ const DEFAULT_IV = '0XiT4j0ZelK4CjHe' // 偏移量
  * @param { Object } data 消息内容
  */
 export const encodeMsg = ({ command, data }) => {
-  const dataStr = encode(JSON.stringify(data))
-  const size = unescape(encodeURIComponent(dataStr)).length
+  const dataHex = encode(JSON.stringify(data))
+  const dataBytes = hexToBytes(dataHex)
+  const body = new Int8Array(dataBytes)
   const bufferData = new ByteBuffer()
     .writeInt(WSENUM.MAGIC_NUMBER) // magic number
     .writeByte(WSENUM.VERSION) // 协议版本
     .writeByte(WSENUM.SERIALIZE) // 序列化 json = 1
     .writeByte(command) // 命令字
-    .writeInt(size) // 包长度
-    .writeString(dataStr) // 包
-  return new TextDecoder('utf-8').decode(bufferData.view)
+    .writeInt(body.length) // 包长度
+    .append(body.buffer) // 包
+  const view = new Int8Array(bufferData.view.buffer)
+  return view
 }
 
 /**
  * 消息解码
  * @param {*} bytes
  */
-export const decodeMsg = str => {
-  const bytes = new TextEncoder('utf-8').encode(str)
+export const decodeMsg = async blob => {
+  const bytes = await blob.arrayBuffer()
   const bufferData = ByteBuffer.wrap(bytes)
   bufferData
     .skip(4) // 跳过 magic number
@@ -50,8 +52,9 @@ export const decodeMsg = str => {
   // 数据包长度
   const length = bufferData.readInt()
   // 数据包
-  const rest = bufferData.view.slice(bufferData.offset, bufferData.offset + length)
-  const data = decode(new TextDecoder('utf-8').decode(rest))
+  const rest = new Int8Array(bufferData.view.slice(bufferData.offset, bufferData.offset + length))
+  const dataHex = bytesToHex(rest)
+  const data = decode(dataHex)
   console.log('序列化算法:' + serializeAlgorithm + ' 指令:' + command + ' 数据包长度:' + length + ' 数据包:' + data)
   return {
     command,
@@ -67,10 +70,11 @@ const encode = str => {
     mode: CryptoJS.mode.CBC,
     padding: CryptoJS.pad.Pkcs7
   })
-  return encrypted.toString()
+  return CryptoJS.enc.Hex.stringify(encrypted.ciphertext)
 }
 
 const decode = str => {
+  str = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64)
   const key = CryptoJS.enc.Utf8.parse(DEFAULT_KEY)
   const iv = CryptoJS.enc.Utf8.parse(DEFAULT_IV)
   const decrypt = CryptoJS.AES.decrypt(str, key, {
@@ -79,4 +83,18 @@ const decode = str => {
     padding: CryptoJS.pad.Pkcs7
   })
   return decrypt.toString(CryptoJS.enc.Utf8)
+}
+
+function hexToBytes(hex) {
+  for (var bytes = [], c = 0; c < hex.length; c += 2) bytes.push(parseInt(hex.substr(c, 2), 16))
+  return bytes
+}
+
+function bytesToHex(bytes) {
+  for (var hex = [], i = 0; i < bytes.length; i++) {
+    var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i]
+    hex.push((current >>> 4).toString(16))
+    hex.push((current & 0xf).toString(16))
+  }
+  return hex.join('')
 }
