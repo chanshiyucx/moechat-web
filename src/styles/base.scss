@@ -21,13 +21,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
-  @include cursor;
-  @include scrollBar;
-  @include pc-layout {
-    // 该属性值在移动设备上会造成比较明显的性能问题
-    // 详见 https://developer.mozilla.org/zh-CN/docs/Web/CSS/text-rendering
-    text-rendering: optimizeLegibility;
-  }
+  // 该属性值在移动设备上会造成比较明显的性能问题
+  text-rendering: optimizeLegibility;
 }
 
 #app {

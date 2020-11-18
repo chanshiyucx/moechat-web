@@ -16,8 +16,7 @@ export default class IM {
     this.socket = null // websocket 实例
     this.pingTimeout = 8000 // 发送心跳包间隔
     this.pingTimer = null // 心跳包定时器
-    this.reconnectLimit = 10 // 最大重连次数
-    this.reconnectCount = 0 // 当前的重连次数
+    this.reconnectLimit = this.reconnectCount = 0 // 最大重连次数 // 当前的重连次数
     this.forbidReconnect = false // 禁止重连
     this.handers = {} // 事件广播
 
@@ -37,17 +36,18 @@ export default class IM {
     this.socket.onclose = () => this._onclose()
     this.socket.onerror = () => this._onerror()
     this.socket.onopen = () => this._onopen()
-    this.socket.onmessage = event => this._onmessage(event)
+    this.socket.onmessage = (event) => this._onmessage(event)
   }
 
   // 连接关闭
   _onclose() {
     console.log('====== 连接关闭')
+    const delay = (1 << this.reconnectCount) * 100
     setTimeout(() => {
       this._clearAllTimer()
       this._reconnect()
       this.options.ondisconnect()
-    }, 300)
+    }, delay)
   }
 
   // 连接错误

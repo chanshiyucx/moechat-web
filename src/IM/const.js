@@ -36,7 +36,7 @@ export const CMD = {
 
   // 群聊消息
   GROUP_MESSAGE_REQUEST: 17,
-  GROUP_MESSAGE_RESPONSE: 18
+  GROUP_MESSAGE_RESPONSE: 18,
 }
 
 /**
@@ -47,5 +47,5 @@ export const TYPES = {
   TEXT: 2, // 文本消息
   PICTURE: 3, // 图片消息
   VOICE: 4, // 语音消息
-  VEDIO: 5 // 视频消息
+  VEDIO: 5, // 视频消息
 }

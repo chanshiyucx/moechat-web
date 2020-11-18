@@ -5,6 +5,15 @@ $black-light: #444;
 $purple: #d68fe9;
 $purple-dark: #b28fce;
 $purple-dim: #986db2;
+$purple-deep: #b854d4;
+
+$primary-color-8: rgba(5, 159, 149, 0.8);
+$primary-color-8_5: rgba(5, 159, 149, 0.85);
+$primary-text-color-8: rgba(255, 255, 255, 0.8);
+
+$primary-color-5:rgba(5,159,149, 0.5); 
+$primary-color-5_5:rgba(5,159,149, 0.55); 
+$primary-text-color-5:rgba(255, 255, 255, 0.5);
 
 // Scaffolding
 // Settings for some of the most global styles.
@@ -20,13 +29,20 @@ $link-color: $purple-deep;
 $selection-bg: $purple;
 $selection-color: white;
 
+// Background
+$bg-white: rgba(255, 255, 255, 0.6);
+$bg-white-dim: rgba(255, 255, 255, 0.7);
+$bg-white-deep: rgba(255, 255, 255, 0.8);
+$bg-dark: rgba(0, 0, 0, 0.1);
+$bg-dark-dim: rgba(0, 0, 0, 0.2);
+$bg-dark-deep: rgba(0, 0, 0, 0.3);
+
 // Typography
 // Font, line-height, and elements colors.
 // --------------------------------------------------
 
 // Font families.
-$font-family-base: "Fira Mono", "Noto Serif SC", -apple-system, Roboto,
-  Helvetica Neue, sans-serif;
+$font-family-base: 'Fira Mono', 'Noto Serif SC', -apple-system, Roboto, Helvetica Neue, sans-serif;
 
 // Font Weight
 $font-weight-normal: 400;

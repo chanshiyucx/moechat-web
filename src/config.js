@@ -16,5 +16,5 @@ if (isDev) {
 
 export default {
   baseURL,
-  imURL
+  imURL,
 }

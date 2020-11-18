@@ -1,32 +1,61 @@
 <template>
   <div id="app">
-    <button @click="login">登录</button>
-    <button @click="close">断开</button>
+    <div class="container" :style="chatStyle">
+      <Sidebar />
+      <Group />
+    </div>
   </div>
 </template>
 
 <script>
-import IM, { CMD } from '@/IM'
 import config from './config'
+import IM, { CMD } from '@/IM'
+import { getWidthPercent, getHeightPercent } from '@/utils/device'
+import Sidebar from '@/components/Sidebar'
+import Group from '@/components/Group'
 
 export default {
   name: 'App',
+  components: { Sidebar, Group },
   data() {
     return {
-      ImSocket: null
+      ImSocket: null,
+      width: getWidthPercent(),
+      height: getHeightPercent()
     }
   },
   created() {
     this.init()
   },
+  computed: {
+    chatStyle() {
+      return {
+        width: `${this.width * 100}%`,
+        height: `${this.height * 100}%`,
+        left: `${((1 - this.width) / 2) * 100}%`,
+        top: `${((1 - this.height) / 2) * 100}%`
+      }
+    }
+  },
+  mounted() {
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize)
+  },
   methods: {
+    // 窗口监听
+    handleResize() {
+      this.width = getWidthPercent()
+      this.height = getHeightPercent()
+    },
     init() {
       this.ImSocket = new IM({
         url: config.imURL,
-        onconnect: this.onconnect, // 服务器连接成功
-        ondisconnect: () => {}, // 服务器已断开连接
-        onerror: () => {}, // 服务器连接发生错误
-        handleResponseEvent: this.handleResponseEvent // 消息业务处理
+        onconnect: this.onconnect,
+        ondisconnect: () => {},
+        onerror: () => {},
+        handleResponseEvent: this.handleResponseEvent
       })
     },
     onconnect() {},
@@ -52,3 +81,17 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scope>
+#app {
+  background-image: url('./assets/images/bg.jpg');
+  background-repeat: no-repeat;
+}
+
+.container {
+  position: absolute;
+  display: flex;
+  border-radius: 10px;
+  box-shadow: 0px 0px 60px rgba(0, 0, 0, 0.5);
+}
+</style>
