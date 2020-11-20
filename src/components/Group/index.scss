@@ -4,4 +4,65 @@
   position: relative;
   display: flex;
   background-color: $primary-color-5;
+
+  ul {
+    flex: 1;
+    overflow-y: auto;
+
+    li {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      height: 90px;
+      transition: background-color 0.2s;
+      &.active {
+        background-color: $primary-color-4;
+      }
+
+      .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 24px;
+      }
+
+      > div {
+        flex: 1;
+        margin-left: 12px;
+
+        > div {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        .head {
+          margin-top: 2px;
+          .name {
+            font-size: $font-size-base;
+            color: $primary-text-color-10;
+          }
+
+          .time {
+            position: relative;
+            top: 4px;
+            font-size: $font-size-small;
+            color: $primary-text-color-7;
+          }
+        }
+
+        .preview {
+          margin-top: 4px;
+          p {
+            width: 188px;
+            height: 20px;
+            color: $primary-text-color-7;
+            font-size: 12px;
+            line-height: 20px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
+      }
+    }
+  }
 }

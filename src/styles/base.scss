@@ -58,5 +58,10 @@ textarea,
 button {
   appearance: none;
   border: none;
+  outline: none;
   border-radius: 0;
+}
+
+ul, ol {
+  list-style: none;
 }

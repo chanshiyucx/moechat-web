@@ -37,6 +37,13 @@ export const CMD = {
   // 群聊消息
   GROUP_MESSAGE_REQUEST: 17,
   GROUP_MESSAGE_RESPONSE: 18,
+
+  // 聊天记录
+  CHAT_HISTORY_REQUEST: 19,
+  CHAT_HISTORY_RESPONSE: 20,
+
+  // 错误消息
+  ERROR_OPERATION_RESPONSE: 101
 }
 
 /**
@@ -47,5 +54,14 @@ export const TYPES = {
   TEXT: 2, // 文本消息
   PICTURE: 3, // 图片消息
   VOICE: 4, // 语音消息
-  VEDIO: 5, // 视频消息
+  VEDIO: 5 // 视频消息
+}
+
+/**
+ * 聊天类型
+ */
+export const CHAT = {
+  CHANNEL: 1, // 世界频道
+  GROUP: 2, // 群组
+  USER: 3 // 用户
 }
