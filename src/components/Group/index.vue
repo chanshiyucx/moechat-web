@@ -29,17 +29,19 @@ export default {
     chatList: {
       type: Array,
       defalt: () => []
+    },
+    chat: {
+      type: Object,
+      defalt: () => {}
     }
   },
   data() {
-    return {
-      chat: {}
-    }
+    return {}
   },
 
   methods: {
     handleChat(chat) {
-      this.chat = chat
+      this.$emit('setChat', chat)
     }
   }
 }

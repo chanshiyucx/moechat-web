@@ -17,6 +17,13 @@
     width: 100%;
     height: 70px;
     border-bottom: 1px solid rgba(208, 208, 208, 0.6);
+
+    i {
+      cursor: pointer;
+      margin: 0 4px;
+      color: $primary-color-8_5;
+      font-size: 24px;
+    }
   }
 
   .body {
@@ -42,6 +49,31 @@
         cursor: pointer;
         color: $primary-color-10;
       }
+    }
+  }
+
+  .members {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 300px;
+    background-color: #fff;
+    transform: translateX(100%);
+    transition: transform 0.5s;
+
+    &.show {
+      transform: translateX(0);
+    }
+
+    .title {
+      height: 70px;
+      line-height: 70px;
+      font-size: 14px;
+      font-weight: bold;
+      text-align: center;
+      color: #666;
+      border-bottom: 1px solid #e8e8e8;
     }
   }
 }

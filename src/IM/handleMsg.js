@@ -7,7 +7,7 @@ import CryptoJS from 'crypto-js'
 const WSENUM = {
   MAGIC_NUMBER: 0x12345678, // 魔法数字
   VERSION: 1, // 协议版本
-  SERIALIZE: 1, // 序列化方式 json = 1
+  SERIALIZE: 1 // 序列化方式 json = 1
 }
 
 // 默认加解密
@@ -37,7 +37,7 @@ export const encodeMsg = ({ command, data }) => {
  * 消息解码
  * @param {*} bytes
  */
-export const decodeMsg = async (blob) => {
+export const decodeMsg = async blob => {
   const bytes = await blob.arrayBuffer()
   const bufferData = ByteBuffer.wrap(bytes)
   bufferData
@@ -57,29 +57,29 @@ export const decodeMsg = async (blob) => {
   // console.log('序列化算法:' + serializeAlgorithm + ' 指令:' + command + ' 数据包长度:' + length + ' 数据包:' + data)
   return {
     command,
-    data: JSON.parse(data),
+    data: JSON.parse(data)
   }
 }
 
-const encode = (str) => {
+const encode = str => {
   const key = CryptoJS.enc.Utf8.parse(DEFAULT_KEY)
   const iv = CryptoJS.enc.Utf8.parse(DEFAULT_IV)
   const encrypted = CryptoJS.AES.encrypt(str, key, {
     iv,
     mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
+    padding: CryptoJS.pad.Pkcs7
   })
   return CryptoJS.enc.Hex.stringify(encrypted.ciphertext)
 }
 
-const decode = (str) => {
+const decode = str => {
   str = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64)
   const key = CryptoJS.enc.Utf8.parse(DEFAULT_KEY)
   const iv = CryptoJS.enc.Utf8.parse(DEFAULT_IV)
   const decrypt = CryptoJS.AES.decrypt(str, key, {
     iv,
     mode: CryptoJS.mode.CBC,
-    padding: CryptoJS.pad.Pkcs7,
+    padding: CryptoJS.pad.Pkcs7
   })
   return decrypt.toString(CryptoJS.enc.Utf8)
 }

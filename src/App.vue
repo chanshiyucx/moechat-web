@@ -2,8 +2,14 @@
   <div id="app">
     <div :style="chatStyle">
       <Sidebar />
-      <Group :chatList="chatList" />
-      <Chat :userInfo="userInfo" @togglePanel="togglePanel" />
+      <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
+      <Chat
+        :userInfo="userInfo"
+        :chat="chat"
+        :listMembers="listMembers"
+        @togglePanel="togglePanel"
+        @sendMessage="sendMessage"
+      />
       <Panel :showPanel="showPanel" @togglePanel="togglePanel" @login="login" />
     </div>
   </div>
@@ -29,7 +35,9 @@ export default {
       height: getHeightPercent(),
       showPanel: false,
       userInfo: {},
-      chatList: []
+      chatList: [],
+      chat: {},
+      listMembers: [],
     }
   },
   created() {
@@ -41,9 +49,9 @@ export default {
         width: `${this.width * 100}%`,
         height: `${this.height * 100}%`,
         left: `${((1 - this.width) / 2) * 100}%`,
-        top: `${((1 - this.height) / 2) * 100}%`
+        top: `${((1 - this.height) / 2) * 100}%`,
       }
-    }
+    },
   },
   mounted() {
     window.addEventListener('resize', this.handleResize)
@@ -63,16 +71,13 @@ export default {
         onconnect: this.login,
         ondisconnect: () => {},
         onerror: () => {},
-        handleResponseEvent: this.handleResponseEvent
+        handleResponseEvent: this.handleResponseEvent,
       })
     },
     login(user = {}) {
       const msg = {
         command: CMD.LOGIN_REQUEST,
-        data: {
-          ...user,
-          token: localRead('token')
-        }
+        data: { ...user, token: localRead('token') },
       }
       this.handleRequestEvent(msg)
     },
@@ -80,6 +85,30 @@ export default {
       this.userInfo = data
       this.showPanel = false
       localSave('token', data.token)
+    },
+    listMembersOk(data) {
+      console.log('this.members', data)
+      if (data.id === this.chat.id && data.type === this.chat.type) {
+        this.listMembers = data.userList
+      }
+    },
+    chatHistoryOk(data) {
+      this.chatList = data.chatList
+      if (this.chatList.length) {
+        this.chat = this.chatList[0]
+        this.getHistory({ id: this.chat.id, type: this.chat.type, index: 0 })
+      }
+    },
+    setChat(chat) {
+      this.chat = chat
+    },
+    getHistory(data) {
+      const msg = { command: CMD.CHAT_MESSAGE_REQUEST, data }
+      this.handleRequestEvent(msg)
+    },
+    sendMessage(msg) {
+      console.log('sendMessage', msg)
+      this.handleRequestEvent(msg)
     },
     close() {
       this.ImSocket.closeSocket()
@@ -93,14 +122,17 @@ export default {
         case CMD.LOGIN_RESPONSE:
           this.loginSuccess(data)
           break
+        case CMD.LIST_MEMBERS_RESPONSE:
+          this.listMembersOk(data)
+          break
+        case CMD.CHAT_HISTORY_RESPONSE:
+          this.chatHistoryOk(data)
+          break
         case CMD.ERROR_OPERATION_RESPONSE:
           this.$toasted.error(data.message)
           if (data.close) {
             this.close()
           }
-          break
-        case CMD.CHAT_HISTORY_RESPONSE:
-          this.chatList = data.chatList
           break
         default:
           break
@@ -108,8 +140,8 @@ export default {
     },
     togglePanel(status) {
       this.showPanel = status
-    }
-  }
+    },
+  },
 }
 </script>
 

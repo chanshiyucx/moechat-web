@@ -36,13 +36,13 @@ export default {
   props: {
     showPanel: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
       username: localRead('username'),
-      password: ''
+      password: '',
     }
   },
   mounted() {},
@@ -59,8 +59,8 @@ export default {
     // 关闭面板
     hidePanel() {
       this.$emit('togglePanel', false)
-    }
-  }
+    },
+  },
 }
 </script>
 

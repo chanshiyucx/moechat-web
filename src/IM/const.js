@@ -2,48 +2,87 @@
  * 消息命令字
  */
 export const CMD = {
-  // 心跳
+  /**
+   * 心跳
+   */
   HEARTBEAT_REQUEST: 1,
   HEARTBEAT_RESPONSE: 2,
 
-  // 登陆
+  /**
+   * 登陆
+   */
   LOGIN_REQUEST: 3,
   LOGIN_RESPONSE: 4,
 
-  // 登出
+  /**
+   * 登出
+   */
   LOGOUT_REQUEST: 5,
   LOGOUT_RESPONSE: 6,
 
-  // 消息
+  /**
+   * 消息
+   */
   MESSAGE_REQUEST: 7,
   MESSAGE_RESPONSE: 8,
 
-  // 创建群聊
-  CREATE_GROUP_REQUEST: 9,
-  CREATE_GROUP_RESPONSE: 10,
+  /**
+   * 添加好友
+   */
+  ADD_FRIEND_REQUEST: 9,
+  ADD_FRIEND_RESPONSE: 10,
 
-  // 加入群聊
-  JOIN_GROUP_REQUEST: 11,
-  JOIN_GROUP_RESPONSE: 12,
+  /**
+   * 移除好友
+   */
+  REMOVE_FRIEND_REQUEST: 11,
+  REMOVE_FRIEND_RESPONSE: 12,
 
-  // 退出群聊
-  QUIT_GROUP_REQUEST: 13,
-  QUIT_GROUP_RESPONSE: 14,
+  /**
+   * 创建群聊
+   */
+  CREATE_GROUP_REQUEST: 13,
+  CREATE_GROUP_RESPONSE: 14,
 
-  // 群成员
-  LIST_GROUP_MEMBERS_REQUEST: 15,
-  LIST_GROUP_MEMBERS_RESPONSE: 16,
+  /**
+   * 加入群聊
+   */
+  JOIN_GROUP_REQUEST: 15,
+  JOIN_GROUP_RESPONSE: 16,
 
-  // 群聊消息
-  GROUP_MESSAGE_REQUEST: 17,
-  GROUP_MESSAGE_RESPONSE: 18,
+  /**
+   * 退出群聊
+   */
+  QUIT_GROUP_REQUEST: 17,
+  QUIT_GROUP_RESPONSE: 18,
 
-  // 聊天记录
-  CHAT_HISTORY_REQUEST: 19,
-  CHAT_HISTORY_RESPONSE: 20,
+  /**
+   * 群成员
+   */
+  LIST_MEMBERS_REQUEST: 19,
+  LIST_MEMBERS_RESPONSE: 20,
 
-  // 错误消息
-  ERROR_OPERATION_RESPONSE: 101
+  /**
+   * 聊天记录
+   */
+  CHAT_HISTORY_REQUEST: 21,
+  CHAT_HISTORY_RESPONSE: 22,
+
+  /**
+   * 历史消息
+   */
+  CHAT_MESSAGE_REQUEST: 23,
+  CHAT_MESSAGE_RESPONSE: 24,
+
+  /**
+   * 消息发送成功
+   */
+  MESSAGE_SUCCESS_RESPONSE: 101,
+
+  /**
+   * 错误消息
+   */
+  ERROR_OPERATION_RESPONSE: 102,
 }
 
 /**
@@ -54,7 +93,7 @@ export const TYPES = {
   TEXT: 2, // 文本消息
   PICTURE: 3, // 图片消息
   VOICE: 4, // 语音消息
-  VEDIO: 5 // 视频消息
+  VEDIO: 5, // 视频消息
 }
 
 /**
@@ -63,5 +102,5 @@ export const TYPES = {
 export const CHAT = {
   CHANNEL: 1, // 世界频道
   GROUP: 2, // 群组
-  USER: 3 // 用户
+  USER: 3, // 用户
 }

@@ -1,6 +1,6 @@
 import { encodeMsg, decodeMsg } from './handleMsg'
 import { CMD as COMMAND } from './const'
-export { CMD, TYPES } from './const'
+export { CMD, TYPES, CHAT } from './const'
 
 /**
  * =====================================================
