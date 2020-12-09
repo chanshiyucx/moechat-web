@@ -7,25 +7,37 @@
         <i class="icon icon-users" @click="handleMembers"></i>
       </div>
     </div>
-    <div class="body">
-      <ul ref="messageList" class="message-list">
-        <li
-          v-for="message in messageList"
-          :key="message.id"
-          :class="['msg', message.fromId === userInfo.userId ? 'me' : 'user']"
-        >
-          111
-          <Avatar class="avatar" :userId="message.fromId" :avatar="message.fromAvatar" />
-        </li>
-      </ul>
-    </div>
+    <ul ref="messageList" class="message-list">
+      <li v-for="msg in messageList" :key="msg.id" :class="['msg', msg.fromId === userInfo.userId ? 'me' : 'user']">
+        <Avatar class="avatar" :userId="msg.fromId" :avatar="msg.fromAvatar" />
+        <div class="right">
+          <div class="info">
+            <span class="nickname">{{ msg.fromNickname || msg.fromUsername }}</span>
+            <span class="time">{{ msg.createTime | formatTime }}</span>
+          </div>
+          <div class="content">
+            <div v-if="msg.message.type === TYPES.TEXT">
+              {{ msg.message.text }}
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
     <div class="footer">
       <p v-if="userInfo.tourist" class="guest">
         游客朋友你好, 请<b class="guestLogin" role="button" @click="login">登录</b>后参与聊天
       </p>
-      <div v-else>
-        <input id="inputArea" type="text" v-model="message" />
-        <button :disabled="!chat.id" @click="sendMessage">发送</button>
+      <div v-else class="chat-input">
+        <div class="menu">
+          <i class="icon icon-emo-devil" @click="toggleEmoji"></i>
+        </div>
+        <div class="menu">
+          <i class="icon icon-picture" @click="toggleEmoji"></i>
+        </div>
+        <input id="inputArea" type="text" v-model="message" placeholder="说点什么吧~" maxlength="2048" />
+        <div class="menu">
+          <i class="icon icon-paper-plane" @click="sendMessage"></i>
+        </div>
       </div>
     </div>
     <div :class="['members', visible.members && 'show']">
@@ -45,11 +57,25 @@
 <script>
 import { CMD, TYPES, CHAT } from '@/IM'
 import emoji from '@/assets/emoji.json'
+import Time from '@/utils/time'
 import Avatar from '../Avatar'
 
 export default {
   name: 'Chat',
   components: { Avatar },
+  filters: {
+    formatTime(time) {
+      const messageTime = new Date(time)
+      const nowTime = new Date()
+      if (Time.isToday(nowTime, messageTime)) {
+        return Time.getHourMinute(messageTime)
+      }
+      if (Time.isYesterday(nowTime, messageTime)) {
+        return `昨天 ${Time.getHourMinute(messageTime)}`
+      }
+      return `${Time.getMonthDate(messageTime)} ${Time.getHourMinute(messageTime)}`
+    },
+  },
   props: {
     userInfo: {
       type: Object,
@@ -70,12 +96,14 @@ export default {
   },
   data() {
     return {
+      TYPES,
       emoji,
       emojiList: [],
       message: '',
       index: 0,
       visible: {
         members: false,
+        emoji: false,
       },
     }
   },
@@ -124,15 +152,17 @@ export default {
       this.$emit('handleRequestEvent', msg)
     },
     sendMessage() {
-      if (this.message.trim() === '') {
-        return this.$toast.error('请先输入要发送的消息内容')
+      const message = this.message.trim()
+      if (message === '') {
+        return this.$toasted.error('请说点什么吧')
       }
+      if (!this.chat) return
       const data = {
         index: ++this.index,
         from: this.userInfo.userId,
         to: this.chat.id,
         type: this.chat.type,
-        message: { contentType: TYPES.TEXT, text: this.message },
+        message: JSON.stringify({ type: TYPES.TEXT, text: message }),
       }
       const msg = { command: CMD.MESSAGE_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
@@ -150,6 +180,9 @@ export default {
         })
         .replace(/\n/g, '</br>')
       return str
+    },
+    toggleEmoji() {
+      this.visible.emoji = !this.visible.emoji
     },
   },
 }

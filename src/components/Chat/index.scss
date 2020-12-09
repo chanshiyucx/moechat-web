@@ -26,13 +26,6 @@
     }
   }
 
-  .body {
-    flex: 1;
-    padding: 8px 10px 0 10px;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
   .footer {
     display: flex;
     align-items: center;
@@ -48,6 +41,43 @@
       b {
         cursor: pointer;
         color: $primary-color-10;
+      }
+    }
+
+    .chat-input {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      .menu {
+        display: inline-block;
+        width: 44px;
+        height: 44px;
+        line-height: 44px;
+        text-align: center;
+        .icon {
+          cursor: pointer;
+          font-size: 24px;
+          color: #a5b5c0;
+          transition: color 0.2s ease;
+        }
+
+        &:hover {
+          .icon {
+            color: $primary-color-10;
+          }
+        }
+      }
+
+      input {
+        flex: 1;
+        margin: 0 10px;
+        padding: 0px 8px;
+        height: 32px;
+        line-height: 32px;
+        outline: none;
+        font-size: 14px;
+        color: #777;
+        border: 1px solid rgba(208, 208, 208, 0.5);
       }
     }
   }
@@ -91,10 +121,78 @@
 }
 
 .message-list {
+  flex: 1;
+  padding: 8px 10px 0 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  li {
+    display: flex;
+    position: relative;
+    margin-right: 54px;
+    margin-bottom: 10px;
+  }
+
   .avatar {
+    margin-top: 6px;
     min-width: 44px;
     width: 44px;
     height: 44px;
     border-radius: 50%;
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 12px;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 23px;
+      left: 49px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0px 7px 15px 0;
+      border-color: transparent rgba(255, 255, 255, 0.8) transparent transparent;
+    }
+
+    .info {
+      height: 20px;
+    }
+
+    .nickname {
+      margin-right: 4px;
+      color: #333;
+      font-size: 13px;
+    }
+
+    .time {
+      color: #666;
+      font-size: 12px;
+    }
+
+    .content {
+      display: flex;
+      position: relative;
+      padding-right: 30px;
+      max-width: -webkit-fill-available;
+
+      > div {
+        display: inline-block;
+        margin-top: 3px;
+        padding: 6px 8px;
+        min-height: 28px;
+        max-width: -webkit-fill-available;
+        font-size: 14px;
+        color: #555;
+        border-radius: 8px;
+        border-top-left-radius: 0px;
+        background-color: rgba(255, 255, 255, 0.8);
+      }
+    }
   }
 }

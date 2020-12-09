@@ -103,6 +103,7 @@ export default {
     chatMessageOk(data) {
       if (data.id !== this.chat.id || data.type !== this.chat.type) return
       const seen = new Map()
+      data.messageList.forEach((msg) => (msg.message = JSON.parse(msg.message)))
       this.messageList = data.messageList
         .reverse()
         .concat(this.messageList)
