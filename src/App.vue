@@ -7,8 +7,9 @@
         :userInfo="userInfo"
         :chat="chat"
         :listMembers="listMembers"
+        :messageList="messageList"
         @togglePanel="togglePanel"
-        @sendMessage="sendMessage"
+        @handleRequestEvent="handleRequestEvent"
       />
       <Panel :showPanel="showPanel" @togglePanel="togglePanel" @login="login" />
     </div>
@@ -38,6 +39,7 @@ export default {
       chatList: [],
       chat: {},
       listMembers: [],
+      messageList: [],
     }
   },
   created() {
@@ -96,18 +98,21 @@ export default {
       this.chatList = data.chatList
       if (this.chatList.length) {
         this.chat = this.chatList[0]
-        this.getHistory({ id: this.chat.id, type: this.chat.type, index: 0 })
       }
+    },
+    chatMessageOk(data) {
+      if (data.id !== this.chat.id || data.type !== this.chat.type) return
+      const seen = new Map()
+      this.messageList = data.messageList
+        .reverse()
+        .concat(this.messageList)
+        .filter((msg) => !seen.has(msg.id) && seen.set(msg.id, 1))
     },
     setChat(chat) {
       this.chat = chat
     },
     getHistory(data) {
-      const msg = { command: CMD.CHAT_MESSAGE_REQUEST, data }
-      this.handleRequestEvent(msg)
-    },
-    sendMessage(msg) {
-      console.log('sendMessage', msg)
+      const msg = { command: CMD.CHAT_HISTORY_REQUEST, data }
       this.handleRequestEvent(msg)
     },
     close() {
@@ -117,7 +122,6 @@ export default {
       this.ImSocket.handleRequestEvent(msg)
     },
     handleResponseEvent({ command, data }) {
-      console.log('msg========', command, data)
       switch (command) {
         case CMD.LOGIN_RESPONSE:
           this.loginSuccess(data)
@@ -127,6 +131,9 @@ export default {
           break
         case CMD.CHAT_HISTORY_RESPONSE:
           this.chatHistoryOk(data)
+          break
+        case CMD.CHAT_MESSAGE_RESPONSE:
+          this.chatMessageOk(data)
           break
         case CMD.ERROR_OPERATION_RESPONSE:
           this.$toasted.error(data.message)

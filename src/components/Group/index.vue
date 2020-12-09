@@ -28,12 +28,12 @@ export default {
   props: {
     chatList: {
       type: Array,
-      defalt: () => []
+      defalt: () => [],
     },
     chat: {
       type: Object,
-      defalt: () => {}
-    }
+      defalt: () => {},
+    },
   },
   data() {
     return {}
@@ -42,8 +42,8 @@ export default {
   methods: {
     handleChat(chat) {
       this.$emit('setChat', chat)
-    }
-  }
+    },
+  },
 }
 </script>
 

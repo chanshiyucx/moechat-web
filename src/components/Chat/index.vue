@@ -2,12 +2,23 @@
   <div class="chat">
     <div class="header">
       <h3>{{ chat.name }}</h3>
-      <div v-if="userInfo.tourist">
+      <div v-if="!userInfo.tourist">
         <i class="icon icon-share" @click="handleShare"></i>
         <i class="icon icon-users" @click="handleMembers"></i>
       </div>
     </div>
-    <div class="body"></div>
+    <div class="body">
+      <ul ref="messageList" class="message-list">
+        <li
+          v-for="message in messageList"
+          :key="message.id"
+          :class="['msg', message.fromId === userInfo.userId ? 'me' : 'user']"
+        >
+          111
+          <Avatar class="avatar" :userId="message.fromId" :avatar="message.fromAvatar" />
+        </li>
+      </ul>
+    </div>
     <div class="footer">
       <p v-if="userInfo.tourist" class="guest">
         游客朋友你好, 请<b class="guestLogin" role="button" @click="login">登录</b>后参与聊天
@@ -19,11 +30,12 @@
     </div>
     <div :class="['members', visible.members && 'show']">
       <div class="head">
+        <i class="icon icon-cancel-alt" @click="visible.members = false"></i>
         <p class="title">群组信息</p>
       </div>
       <ul>
         <li v-for="user in listMembers" :key="user.id">
-          {{ user }}
+          {{ user.nickname }}
         </li>
       </ul>
     </div>
@@ -33,9 +45,11 @@
 <script>
 import { CMD, TYPES, CHAT } from '@/IM'
 import emoji from '@/assets/emoji.json'
+import Avatar from '../Avatar'
 
 export default {
   name: 'Chat',
+  components: { Avatar },
   props: {
     userInfo: {
       type: Object,
@@ -46,6 +60,10 @@ export default {
       default: () => {},
     },
     listMembers: {
+      type: Array,
+      default: () => [],
+    },
+    messageList: {
       type: Array,
       default: () => [],
     },
@@ -60,6 +78,11 @@ export default {
         members: false,
       },
     }
+  },
+  watch: {
+    chat() {
+      this.getChatMessage()
+    },
   },
   mounted() {
     // 处理表情包数据
@@ -91,9 +114,15 @@ export default {
       if (!this.chat) return
       const data = { id: this.chat.id, type: this.chat.type }
       const msg = { command: CMD.LIST_MEMBERS_REQUEST, data }
-      this.$emit('sendMessage', msg)
+      this.$emit('handleRequestEvent', msg)
     },
-
+    getChatMessage() {
+      if (!this.chat) return
+      const lastMsg = this.messageList[this.messageList.length - 1]
+      const data = { id: this.chat.id, type: this.chat.type, index: lastMsg ? lastMsg.index : 0 }
+      const msg = { command: CMD.CHAT_MESSAGE_REQUEST, data }
+      this.$emit('handleRequestEvent', msg)
+    },
     sendMessage() {
       if (this.message.trim() === '') {
         return this.$toast.error('请先输入要发送的消息内容')
@@ -106,8 +135,21 @@ export default {
         message: { contentType: TYPES.TEXT, text: this.message },
       }
       const msg = { command: CMD.MESSAGE_REQUEST, data }
-      this.$emit('sendMessage', msg)
+      this.$emit('handleRequestEvent', msg)
       this.message = ''
+    },
+    toHtml(text) {
+      const str = text
+        .replace(/(\[.*?\])/g, ($1) => {
+          if (this.emoji[$1]) {
+            let url = require(`@/assets/emoji/${this.emoji[$1]}.png`)
+            return `<img src="${url}" class="emoji" name="${$1}"/>`
+          } else {
+            return $1
+          }
+        })
+        .replace(/\n/g, '</br>')
+      return str
     },
   },
 }
