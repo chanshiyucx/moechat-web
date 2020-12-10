@@ -39,7 +39,7 @@ export default {
       chatList: [],
       chat: {},
       listMembers: [],
-      messageList: [],
+      chatMessage: [],
     }
   },
   created() {
@@ -53,6 +53,11 @@ export default {
         left: `${((1 - this.width) / 2) * 100}%`,
         top: `${((1 - this.height) / 2) * 100}%`,
       }
+    },
+    messageList() {
+      if (!this.chat) return []
+      const chatMessage = this.chatMessage.find((o) => o.id === this.chat.id && o.type === this.chat.type)
+      return chatMessage ? chatMessage.messageList : []
     },
   },
   mounted() {
@@ -100,6 +105,12 @@ export default {
         this.chat = this.chatList[0]
       }
     },
+    chatRecentOk(data) {
+      data.recentMessageList.forEach((o) => {
+        o.messageList.forEach((msg) => (msg.message = JSON.parse(msg.message)))
+      })
+      this.chatMessage = data.recentMessageList
+    },
     chatMessageOk(data) {
       if (data.id !== this.chat.id || data.type !== this.chat.type) return
       const seen = new Map()
@@ -132,6 +143,9 @@ export default {
           break
         case CMD.CHAT_HISTORY_RESPONSE:
           this.chatHistoryOk(data)
+          break
+        case CMD.CHAT_RECENT_RESPONSE:
+          this.chatRecentOk(data)
           break
         case CMD.CHAT_MESSAGE_RESPONSE:
           this.chatMessageOk(data)

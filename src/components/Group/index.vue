@@ -14,7 +14,7 @@
             <p class="time">15:18</p>
           </div>
           <div class="preview">
-            <p>我是不想去上班</p>
+            <p>摸鱼打卡</p>
           </div>
         </div>
       </li>

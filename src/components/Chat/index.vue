@@ -16,9 +16,7 @@
             <span class="time">{{ msg.createTime | formatTime }}</span>
           </div>
           <div class="content">
-            <div v-if="msg.message.type === TYPES.TEXT">
-              {{ msg.message.text }}
-            </div>
+            <div v-if="msg.message.type === TYPES.TEXT">{{ msg.message.text }}</div>
           </div>
         </div>
       </li>
@@ -71,7 +69,7 @@ export default {
         return Time.getHourMinute(messageTime)
       }
       if (Time.isYesterday(nowTime, messageTime)) {
-        return `昨天 ${Time.getHourMinute(messageTime)}`
+        return `昨天${Time.getHourMinute(messageTime)}`
       }
       return `${Time.getMonthDate(messageTime)} ${Time.getHourMinute(messageTime)}`
     },
@@ -106,11 +104,6 @@ export default {
         emoji: false,
       },
     }
-  },
-  watch: {
-    chat() {
-      this.getChatMessage()
-    },
   },
   mounted() {
     // 处理表情包数据

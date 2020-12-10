@@ -63,16 +63,22 @@ export const CMD = {
   LIST_MEMBERS_RESPONSE: 20,
 
   /**
-   * 聊天记录
+   * 聊天列表
    */
   CHAT_HISTORY_REQUEST: 21,
   CHAT_HISTORY_RESPONSE: 22,
 
   /**
+   * 最近聊天记录
+   */
+  CHAT_RECENT_REQUEST: 23,
+  CHAT_RECENT_RESPONSE: 24,
+
+  /**
    * 历史消息
    */
-  CHAT_MESSAGE_REQUEST: 23,
-  CHAT_MESSAGE_RESPONSE: 24,
+  CHAT_MESSAGE_REQUEST: 25,
+  CHAT_MESSAGE_RESPONSE: 26,
 
   /**
    * 消息发送成功
