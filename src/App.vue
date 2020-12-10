@@ -9,6 +9,7 @@
         :listMembers="listMembers"
         :messageList="messageList"
         @togglePanel="togglePanel"
+        @sendMessage="sendMessage"
         @handleRequestEvent="handleRequestEvent"
       />
       <Panel :showPanel="showPanel" @togglePanel="togglePanel" @login="login" />
@@ -39,7 +40,8 @@ export default {
       chatList: [],
       chat: {},
       listMembers: [],
-      chatMessage: [],
+      chatMessage: {},
+      index: 0,
     }
   },
   created() {
@@ -56,8 +58,8 @@ export default {
     },
     messageList() {
       if (!this.chat) return []
-      const chatMessage = this.chatMessage.find((o) => o.id === this.chat.id && o.type === this.chat.type)
-      return chatMessage ? chatMessage.messageList : []
+      const key = `${this.chat.id}_${this.chat.type}`
+      return this.chatMessage[key] || []
     },
   },
   mounted() {
@@ -67,7 +69,6 @@ export default {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
-    // 窗口监听
     handleResize() {
       this.width = getWidthPercent()
       this.height = getHeightPercent()
@@ -88,44 +89,71 @@ export default {
       }
       this.handleRequestEvent(msg)
     },
-    loginSuccess(data) {
+    loginResponse(data) {
       this.userInfo = data
       this.showPanel = false
       localSave('token', data.token)
     },
-    listMembersOk(data) {
+    listMembersResponse(data) {
       console.log('this.members', data)
       if (data.id === this.chat.id && data.type === this.chat.type) {
         this.listMembers = data.userList
       }
     },
-    chatHistoryOk(data) {
+    chatHistoryResponse(data) {
       this.chatList = data.chatList
       if (this.chatList.length) {
         this.chat = this.chatList[0]
       }
     },
-    chatRecentOk(data) {
+    chatRecentResponse(data) {
+      const chatMessage = {}
       data.recentMessageList.forEach((o) => {
         o.messageList.forEach((msg) => (msg.message = JSON.parse(msg.message)))
+        const key = `${o.id}_${o.type}`
+        chatMessage[key] = o.messageList.reverse()
       })
-      this.chatMessage = data.recentMessageList
+      this.chatMessage = chatMessage
     },
-    chatMessageOk(data) {
+    chatMessageResponse(data) {
       if (data.id !== this.chat.id || data.type !== this.chat.type) return
+      const key = `${this.chat.id}_${this.chat.type}`
+      const chatMessageList = this.chatMessage[key]
       const seen = new Map()
       data.messageList.forEach((msg) => (msg.message = JSON.parse(msg.message)))
-      this.messageList = data.messageList
+      const newChatMsg = data.messageList
         .reverse()
-        .concat(this.messageList)
+        .concat(chatMessageList)
         .filter((msg) => !seen.has(msg.id) && seen.set(msg.id, 1))
+      this.$set(this.chatMessage, key, newChatMsg)
     },
     setChat(chat) {
       this.chat = chat
     },
-    getHistory(data) {
-      const msg = { command: CMD.CHAT_HISTORY_REQUEST, data }
+    sendMessage(message) {
+      if (!this.chat) return
+      const { userId, nickname, avatar } = this.userInfo
+      const data = {
+        index: ++this.index,
+        fromId: userId,
+        toId: this.chat.id,
+        toType: this.chat.type,
+        message: JSON.stringify(message),
+      }
+      const msg = { command: CMD.MESSAGE_REQUEST, data }
       this.handleRequestEvent(msg)
+
+      // state 0 发送中, 1 发送成功
+      const localMsg = {
+        ...data,
+        message,
+        fromNickname: nickname,
+        fromAvatar: avatar,
+        state: 0,
+        createTime: new Date(),
+      }
+      const key = `${this.chat.id}_${this.chat.type}`
+      this.chatMessage[key].push(localMsg)
     },
     close() {
       this.ImSocket.closeSocket()
@@ -136,19 +164,19 @@ export default {
     handleResponseEvent({ command, data }) {
       switch (command) {
         case CMD.LOGIN_RESPONSE:
-          this.loginSuccess(data)
+          this.loginResponse(data)
           break
         case CMD.LIST_MEMBERS_RESPONSE:
-          this.listMembersOk(data)
+          this.listMembersResponse(data)
           break
         case CMD.CHAT_HISTORY_RESPONSE:
-          this.chatHistoryOk(data)
+          this.chatHistoryResponse(data)
           break
         case CMD.CHAT_RECENT_RESPONSE:
-          this.chatRecentOk(data)
+          this.chatRecentResponse(data)
           break
         case CMD.CHAT_MESSAGE_RESPONSE:
-          this.chatMessageOk(data)
+          this.chatMessageResponse(data)
           break
         case CMD.ERROR_OPERATION_RESPONSE:
           this.$toasted.error(data.message)

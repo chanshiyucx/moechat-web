@@ -7,7 +7,7 @@
         <i class="icon icon-users" @click="handleMembers"></i>
       </div>
     </div>
-    <ul ref="messageList" class="message-list">
+    <ul ref="messageList" class="message-list i-scroll" @scroll="handleScroll">
       <li v-for="msg in messageList" :key="msg.id" :class="['msg', msg.fromId === userInfo.userId ? 'me' : 'user']">
         <Avatar class="avatar" :userId="msg.fromId" :avatar="msg.fromAvatar" />
         <div class="right">
@@ -97,13 +97,20 @@ export default {
       TYPES,
       emoji,
       emojiList: [],
-      message: '',
-      index: 0,
       visible: {
         members: false,
         emoji: false,
       },
+      isFetching: false,
+      message: '',
     }
+  },
+  watch: {
+    messageList(val, oldVal) {
+      if (oldVal.length === 0) {
+        this.scrollToBottom()
+      }
+    },
   },
   mounted() {
     // 处理表情包数据
@@ -126,6 +133,12 @@ export default {
     login() {
       this.$emit('togglePanel', true)
     },
+    handleScroll(e) {
+      const $div = e.target
+      if ($div.scrollTop === 0 && $div.scrollHeight > $div.clientHeight) {
+        this.getChatMessage()
+      }
+    },
     handleShare() {},
     handleMembers() {
       this.getListMembers()
@@ -139,6 +152,11 @@ export default {
     },
     getChatMessage() {
       if (!this.chat) return
+      this.isFetching = true
+      setTimeout(() => {
+        this.isFetching = false
+      }, 3000)
+
       const lastMsg = this.messageList[this.messageList.length - 1]
       const data = { id: this.chat.id, type: this.chat.type, index: lastMsg ? lastMsg.index : 0 }
       const msg = { command: CMD.CHAT_MESSAGE_REQUEST, data }
@@ -149,17 +167,14 @@ export default {
       if (message === '') {
         return this.$toasted.error('请说点什么吧')
       }
-      if (!this.chat) return
-      const data = {
-        index: ++this.index,
-        from: this.userInfo.userId,
-        to: this.chat.id,
-        type: this.chat.type,
-        message: JSON.stringify({ type: TYPES.TEXT, text: message }),
-      }
-      const msg = { command: CMD.MESSAGE_REQUEST, data }
-      this.$emit('handleRequestEvent', msg)
+      this.$emit('sendMessage', { type: TYPES.TEXT, text: message })
       this.message = ''
+      this.scrollToBottom()
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        this.$refs.messageList.scrollTop = this.$refs.messageList.scrollHeight
+      })
     },
     toHtml(text) {
       const str = text
