@@ -1,9 +1,11 @@
 <template>
   <div id="app">
+    {{ visible }}
     <div :style="chatStyle">
       <Sidebar />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
       <Chat
+        :visible.sync="visible"
         :userInfo="userInfo"
         :chat="chat"
         :listMembers="listMembers"
@@ -35,6 +37,10 @@ export default {
       ImSocket: null,
       width: getWidthPercent(),
       height: getHeightPercent(),
+      visible: {
+        members: false,
+        emoji: false,
+      },
       showPanel: false,
       userInfo: {},
       chatList: [],
@@ -64,14 +70,29 @@ export default {
   },
   mounted() {
     window.addEventListener('resize', this.handleResize)
+    document.addEventListener('click', this.handleClick)
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
+    document.removeEventListener('click', this.handleClick)
   },
   methods: {
     handleResize() {
       this.width = getWidthPercent()
       this.height = getHeightPercent()
+    },
+    handleClick(event) {
+      const eventDom = event.target
+
+      // emoji 弹框
+      const emojiDom = document.querySelector('.emoji-box')
+      if (!(eventDom === emojiDom || emojiDom.contains(eventDom))) {
+        console.log('关闭弹窗')
+        this.visible.emoji = false
+      }
+
+      // 群组信息
+      // const membersDom
     },
     init() {
       this.ImSocket = new IM({
@@ -95,7 +116,6 @@ export default {
       localSave('token', data.token)
     },
     listMembersResponse(data) {
-      console.log('this.members', data)
       if (data.id === this.chat.id && data.type === this.chat.type) {
         this.listMembers = data.userList
       }

@@ -93,6 +93,7 @@
           transition: color 0.2s ease;
         }
 
+        &.active,
         &:hover {
           .icon {
             color: $primary-color-10;

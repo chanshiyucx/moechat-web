@@ -33,7 +33,7 @@
             </li>
           </ul>
         </Transition>
-        <div class="menu">
+        <div :class="['menu', visible.emoji && 'active']">
           <i class="icon icon-emo-devil" @click="toggleEmoji"></i>
         </div>
         <div class="menu">
@@ -47,7 +47,6 @@
     </div>
     <div :class="['members', visible.members && 'show']">
       <div class="head">
-        <i class="icon icon-cancel-alt" @click="visible.members = false"></i>
         <p class="title">群组信息</p>
       </div>
       <ul>
@@ -82,6 +81,10 @@ export default {
     },
   },
   props: {
+    visible: {
+      type: Object,
+      default: () => {},
+    },
     userInfo: {
       type: Object,
       default: () => {},
@@ -104,10 +107,6 @@ export default {
       TYPES,
       emoji,
       emojiList: [],
-      visible: {
-        members: false,
-        emoji: false,
-      },
       isFetching: false,
       message: '',
     }
@@ -125,12 +124,11 @@ export default {
       return { name: emoji[o], val: o }
     })
 
-    const inputArea = document.getElementById('inputArea')
     // ENTER 键发送消息
+    const inputArea = document.getElementById('inputArea')
     inputArea.onkeydown = (event) => {
       const e = event || window.event
       if (e.keyCode === 13) {
-        // 如果是直接发送或者组合键
         e.preventDefault()
         this.sendMessage()
       }
@@ -149,7 +147,7 @@ export default {
     handleShare() {},
     handleMembers() {
       this.getListMembers()
-      this.visible.members = true
+      this.$emit('update:visible', { ...this.visible, members: true })
     },
     getListMembers() {
       if (!this.chat) return
@@ -196,7 +194,8 @@ export default {
         .replace(/\n/g, '</br>')
       return str
     },
-    toggleEmoji() {
+    toggleEmoji(event) {
+      event.stopPropagation()
       this.visible.emoji = !this.visible.emoji
     },
     handleEmoji(emoji) {

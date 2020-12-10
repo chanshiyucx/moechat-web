@@ -1,7 +1,7 @@
 /* fade-transform */
 .fade-transform-leave-active,
 .fade-transform-enter-active {
-  transition: color 0.3s;
+  transition: all 0.5s;
 }
 .fade-transform-enter {
   opacity: 0;
