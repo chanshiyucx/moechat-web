@@ -47,7 +47,39 @@
     .chat-input {
       display: flex;
       align-items: center;
+      position: relative;
       width: 100%;
+      height: 100%;
+
+      .emoji-box {
+        position: absolute;
+        top: 0;
+        left: -20px;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 6px 0;
+        width: 440px;
+        height: 200px;
+        overflow: auto;
+        user-select: none;
+        border-radius: 3px;
+        box-shadow: 0 0 10px inset rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        transform: translateY(-100%);
+
+        li {
+          cursor: pointer;
+          margin: 4px;
+          width: 28px;
+          height: 28px;
+
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
       .menu {
         display: inline-block;
         width: 44px;
@@ -193,6 +225,12 @@
         border-radius: 8px;
         border-top-left-radius: 0px;
         background-color: rgba(255, 255, 255, 0.8);
+      }
+
+      .emoji {
+        margin: 0 4px;
+        width: 28px;
+        height: 28px;
       }
     }
   }

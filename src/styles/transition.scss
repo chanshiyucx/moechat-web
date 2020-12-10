@@ -1,0 +1,11 @@
+/* fade-transform */
+.fade-transform-leave-active,
+.fade-transform-enter-active {
+  transition: color 0.3s;
+}
+.fade-transform-enter {
+  opacity: 0;
+}
+.fade-transform-leave-to {
+  opacity: 0;
+}

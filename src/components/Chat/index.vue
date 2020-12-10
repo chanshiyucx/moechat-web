@@ -16,7 +16,7 @@
             <span class="time">{{ msg.createTime | formatTime }}</span>
           </div>
           <div class="content">
-            <div v-if="msg.message.type === TYPES.TEXT">{{ msg.message.text }}</div>
+            <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
           </div>
         </div>
       </li>
@@ -26,6 +26,13 @@
         游客朋友你好, 请<b class="guestLogin" role="button" @click="login">登录</b>后参与聊天
       </p>
       <div v-else class="chat-input">
+        <Transition name="fade-transform" mode="out-in">
+          <ul v-show="visible.emoji" class="emoji-box i-scroll">
+            <li v-for="emoji in emojiList" :key="emoji.name" @click="handleEmoji(emoji)">
+              <img :src="require(`@/assets/emoji/${emoji.name}.png`)" />
+            </li>
+          </ul>
+        </Transition>
         <div class="menu">
           <i class="icon icon-emo-devil" @click="toggleEmoji"></i>
         </div>
@@ -191,6 +198,9 @@ export default {
     },
     toggleEmoji() {
       this.visible.emoji = !this.visible.emoji
+    },
+    handleEmoji(emoji) {
+      this.message += [emoji.val]
     },
   },
 }
