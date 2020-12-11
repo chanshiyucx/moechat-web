@@ -158,9 +158,8 @@
   padding: 8px 10px 0 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth;
 
-  li {
+  .msg {
     display: flex;
     position: relative;
     margin-right: 54px;
@@ -182,19 +181,9 @@
     margin-left: 12px;
     overflow: hidden;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 23px;
-      left: 49px;
-      width: 0;
-      height: 0;
-      border-style: solid;
-      border-width: 0px 7px 15px 0;
-      border-color: transparent rgba(255, 255, 255, 0.8) transparent transparent;
-    }
-
     .info {
+      display: flex;
+      align-items: flex-end;
       height: 20px;
     }
 
@@ -232,6 +221,68 @@
         margin: 0 4px;
         width: 28px;
         height: 28px;
+      }
+    }
+  }
+
+  .user {
+    .right {
+      &::before {
+        content: '';
+        position: absolute;
+        top: 23px;
+        left: 49px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 7px 15px 0;
+        border-color: transparent rgba(255, 255, 255, 0.8) transparent transparent;
+      }
+    }
+  }
+
+  .me {
+    flex-direction: row-reverse;
+    margin-right: 0px;
+    margin-left: 54px;
+
+    .right {
+      margin-left: 0px;
+      margin-right: 12px;
+      align-items: flex-end;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 23px;
+        right: 49px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 0 15px 7px;
+        border-color: transparent transparent transparent $primary-color-10;
+      }
+
+      .info {
+        flex-direction: row-reverse;
+      }
+
+      .nickname {
+        margin-right: 0;
+        margin-left: 4px;
+      }
+
+      .content {
+        flex-direction: row-reverse;
+        padding-left: 30px;
+        padding-right: 0;
+
+        > div {
+          color: #fff;
+          border-top-left-radius: 8px;
+          border-top-right-radius: 0px;
+          background-color: $primary-color-10;
+        }
       }
     }
   }

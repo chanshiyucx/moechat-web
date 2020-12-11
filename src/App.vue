@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    {{ visible }}
     <div :style="chatStyle">
       <Sidebar />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
@@ -86,13 +85,15 @@ export default {
 
       // emoji 弹框
       const emojiDom = document.querySelector('.emoji-box')
-      if (!(eventDom === emojiDom || emojiDom.contains(eventDom))) {
-        console.log('关闭弹窗')
+      if (emojiDom && !(eventDom === emojiDom || emojiDom.contains(eventDom))) {
         this.visible.emoji = false
       }
 
       // 群组信息
-      // const membersDom
+      const membersDom = document.querySelector('.members')
+      if (membersDom && !(eventDom === membersDom || membersDom.contains(eventDom))) {
+        this.visible.members = false
+      }
     },
     init() {
       this.ImSocket = new IM({
@@ -114,6 +115,14 @@ export default {
       this.userInfo = data
       this.showPanel = false
       localSave('token', data.token)
+    },
+    messageResponse(data) {
+      data.message = JSON.parse(data.message)
+      const key = `${data.receiver}_${data.type}`
+      const list = this.chatMessage[key]
+      if (list) {
+        list.push(data)
+      }
     },
     listMembersResponse(data) {
       if (data.id === this.chat.id && data.type === this.chat.type) {
@@ -155,9 +164,9 @@ export default {
       const { userId, nickname, avatar } = this.userInfo
       const data = {
         index: ++this.index,
-        fromId: userId,
-        toId: this.chat.id,
-        toType: this.chat.type,
+        sender: userId,
+        receiver: this.chat.id,
+        type: this.chat.type,
         message: JSON.stringify(message),
       }
       const msg = { command: CMD.MESSAGE_REQUEST, data }
@@ -167,8 +176,8 @@ export default {
       const localMsg = {
         ...data,
         message,
-        fromNickname: nickname,
-        fromAvatar: avatar,
+        nickname,
+        avatar,
         state: 0,
         createTime: new Date(),
       }
@@ -185,6 +194,9 @@ export default {
       switch (command) {
         case CMD.LOGIN_RESPONSE:
           this.loginResponse(data)
+          break
+        case CMD.MESSAGE_RESPONSE:
+          this.messageResponse(data)
           break
         case CMD.LIST_MEMBERS_RESPONSE:
           this.listMembersResponse(data)
@@ -209,6 +221,7 @@ export default {
       }
     },
     togglePanel(status) {
+      console.log('111111111', status)
       this.showPanel = status
     },
   },

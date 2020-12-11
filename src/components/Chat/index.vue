@@ -8,11 +8,11 @@
       </div>
     </div>
     <ul ref="messageList" class="message-list i-scroll" @scroll="handleScroll">
-      <li v-for="msg in messageList" :key="msg.id" :class="['msg', msg.fromId === userInfo.userId ? 'me' : 'user']">
-        <Avatar class="avatar" :userId="msg.fromId" :avatar="msg.fromAvatar" />
+      <li v-for="msg in messageList" :key="msg.id" :class="['msg', msg.sender === userInfo.userId ? 'me' : 'user']">
+        <Avatar class="avatar" :userId="msg.sender" :avatar="msg.avatar" />
         <div class="right">
           <div class="info">
-            <span class="nickname">{{ msg.fromNickname || msg.fromUsername }}</span>
+            <span class="nickname">{{ msg.nickname || msg.username }}</span>
             <span class="time">{{ msg.createTime | formatTime }}</span>
           </div>
           <div class="content">
@@ -108,13 +108,16 @@ export default {
       emoji,
       emojiList: [],
       isFetching: false,
+      toBottom: false,
       message: '',
     }
   },
   watch: {
     messageList(val, oldVal) {
-      if (oldVal.length === 0) {
+      if (oldVal.length === 0 || this.toBottom) {
         this.scrollToBottom()
+      } else {
+        this.calcSrcoll()
       }
     },
   },
@@ -135,6 +138,26 @@ export default {
     }
   },
   methods: {
+    scrollToBottom() {
+      this.$nextTick(() => {
+        this.toBottom = false
+        this.$refs.messageList.scrollTop = this.$refs.messageList.scrollHeight
+      })
+    },
+    calcSrcoll() {
+      const scrollTop = this.$refs.messageList.scrollTop
+      const scrollHeight = this.$refs.messageList.scrollHeight
+      const clientHeight = this.$refs.messageList.clientHeight
+      // 当滚动距离距底部 100 以内时自动滚动到底部
+      const bottomDistance = scrollHeight - scrollTop - clientHeight
+      if (bottomDistance < 100) {
+        this.scrollToBottom()
+      } else {
+        this.$nextTick(() => {
+          this.$refs.messageList.scrollTop = this.$refs.messageList.scrollHeight - clientHeight - bottomDistance
+        })
+      }
+    },
     login() {
       this.$emit('togglePanel', true)
     },
@@ -145,9 +168,11 @@ export default {
       }
     },
     handleShare() {},
-    handleMembers() {
+    handleMembers(event) {
+      event.stopPropagation()
       this.getListMembers()
-      this.$emit('update:visible', { ...this.visible, members: true })
+      this.visible.members = true
+      this.visible.emoji = false
     },
     getListMembers() {
       if (!this.chat) return
@@ -160,7 +185,7 @@ export default {
       this.isFetching = true
       setTimeout(() => {
         this.isFetching = false
-      }, 3000)
+      }, 2000)
 
       const lastMsg = this.messageList[this.messageList.length - 1]
       const data = { id: this.chat.id, type: this.chat.type, index: lastMsg ? lastMsg.index : 0 }
@@ -174,12 +199,7 @@ export default {
       }
       this.$emit('sendMessage', { type: TYPES.TEXT, text: message })
       this.message = ''
-      this.scrollToBottom()
-    },
-    scrollToBottom() {
-      this.$nextTick(() => {
-        this.$refs.messageList.scrollTop = this.$refs.messageList.scrollHeight
-      })
+      this.toBottom = true
     },
     toHtml(text) {
       const str = text
@@ -197,6 +217,7 @@ export default {
     toggleEmoji(event) {
       event.stopPropagation()
       this.visible.emoji = !this.visible.emoji
+      this.visible.members = false
     },
     handleEmoji(emoji) {
       this.message += [emoji.val]
