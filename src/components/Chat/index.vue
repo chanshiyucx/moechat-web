@@ -15,7 +15,12 @@
             <span class="nickname">{{ msg.nickname || msg.username }}</span>
             <span class="time">{{ msg.createTime | formatTime }}</span>
           </div>
-          <div class="content">
+          <div :class="['content', msg.state === 0 && 'loading-box']">
+            <span class="loading">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </span>
             <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
           </div>
         </div>
