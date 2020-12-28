@@ -9,6 +9,7 @@
         :chat="chat"
         :listMembers="listMembers"
         :messageList="messageList"
+        :msgMq="msgMq"
         @togglePanel="togglePanel"
         @sendMessage="sendMessage"
         @handleRequestEvent="handleRequestEvent"
@@ -47,6 +48,7 @@ export default {
       listMembers: [],
       chatMessage: {},
       index: 0,
+      msgMq: {},
     }
   },
   created() {
@@ -70,6 +72,8 @@ export default {
   mounted() {
     window.addEventListener('resize', this.handleResize)
     document.addEventListener('click', this.handleClick)
+
+    this.msgTask()
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
@@ -94,6 +98,23 @@ export default {
       if (membersDom && !(eventDom === membersDom || membersDom.contains(eventDom))) {
         this.visible.members = false
       }
+    },
+    msgTask() {
+      setTimeout(() => {
+        console.log('msgTask')
+        const newMq = {}
+        Object.keys(this.msgMq).forEach((k) => {
+          const item = this.msgMq[k]
+          if (item.count < 3) {
+            item.count++
+          } else {
+            item.state = 1
+          }
+          newMq[k] = item
+        })
+        this.msgMq = newMq
+        this.msgTask()
+      }, 1000)
     },
     init() {
       this.ImSocket = new IM({
@@ -156,6 +177,9 @@ export default {
         .filter((msg) => !seen.has(msg.id) && seen.set(msg.id, 1))
       this.$set(this.chatMessage, key, newChatMsg)
     },
+    messageSuccessResponse(data) {
+      delete this.msgMq[data.index]
+    },
     setChat(chat) {
       this.chat = chat
     },
@@ -172,17 +196,18 @@ export default {
       const msg = { command: CMD.MESSAGE_REQUEST, data }
       this.handleRequestEvent(msg)
 
-      // state 0 发送中, 1 发送成功
       const localMsg = {
         ...data,
         message,
         nickname,
         avatar,
-        state: 0,
         createTime: new Date(),
       }
       const key = `${this.chat.id}_${this.chat.type}`
       this.chatMessage[key].push(localMsg)
+
+      // 设置消息状态，0 发送中，1 失败
+      this.msgMq[data.index] = { state: 0, count: 0 }
     },
     close() {
       this.ImSocket.closeSocket()
@@ -210,6 +235,9 @@ export default {
         case CMD.CHAT_MESSAGE_RESPONSE:
           this.chatMessageResponse(data)
           break
+        case CMD.MESSAGE_SUCCESS_RESPONSE:
+          this.messageSuccessResponse(data)
+          break
         case CMD.ERROR_OPERATION_RESPONSE:
           this.$toasted.error(data.message)
           if (data.close) {
@@ -221,7 +249,6 @@ export default {
       }
     },
     togglePanel(status) {
-      console.log('111111111', status)
       this.showPanel = status
     },
   },

@@ -1,5 +1,6 @@
 <template>
   <div class="chat">
+    {{ msgMq }}
     <div class="header">
       <h3>{{ chat.name }}</h3>
       <div v-if="!userInfo.tourist">
@@ -10,17 +11,12 @@
     <ul ref="messageList" class="message-list i-scroll" @scroll="handleScroll">
       <li v-for="msg in messageList" :key="msg.id" :class="['msg', msg.sender === userInfo.userId ? 'me' : 'user']">
         <Avatar class="avatar" :userId="msg.sender" :avatar="msg.avatar" />
-        <div class="right">
+        <div :class="['right', isFailed(msg.index) && 'failed']">
           <div class="info">
             <span class="nickname">{{ msg.nickname || msg.username }}</span>
             <span class="time">{{ msg.createTime | formatTime }}</span>
           </div>
-          <div :class="['content', msg.state === 0 && 'loading-box']">
-            <span class="loading">
-              <span class="dot"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </span>
+          <div class="content">
             <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
           </div>
         </div>
@@ -106,6 +102,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    msgMq: {
+      type: Object,
+      default: () => {},
+    },
   },
   data() {
     return {
@@ -143,6 +143,10 @@ export default {
     }
   },
   methods: {
+    isFailed(index) {
+      if (!index) return false
+      return this.msgMq[index] && this.msgMq[index].state === 1
+    },
     scrollToBottom() {
       this.$nextTick(() => {
         this.toBottom = false
