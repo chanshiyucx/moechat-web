@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div :style="chatStyle">
-      <Sidebar />
+      <Sidebar :online="online" :userInfo="userInfo" />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
       <Chat
         :visible.sync="visible"
@@ -10,11 +10,10 @@
         :listMembers="listMembers"
         :messageList="messageList"
         :msgMq="msgMq"
-        @togglePanel="togglePanel"
         @sendMessage="sendMessage"
         @handleRequestEvent="handleRequestEvent"
       />
-      <Panel :showPanel="showPanel" @togglePanel="togglePanel" @login="login" />
+      <Panel :showPanel.sync="visible.panel" @login="login" />
     </div>
   </div>
 </template>
@@ -40,8 +39,9 @@ export default {
       visible: {
         members: false,
         emoji: false,
+        panel: false,
       },
-      showPanel: false,
+      online: false,
       userInfo: {},
       chatList: [],
       chat: {},
@@ -120,7 +120,7 @@ export default {
       this.ImSocket = new IM({
         url: config.imURL,
         onconnect: this.login,
-        ondisconnect: () => {},
+        ondisconnect: this.ondisconnect,
         onerror: () => {},
         handleResponseEvent: this.handleResponseEvent,
       })
@@ -132,9 +132,13 @@ export default {
       }
       this.handleRequestEvent(msg)
     },
+    ondisconnect() {
+      this.online = false
+    },
     loginResponse(data) {
+      this.online = true
       this.userInfo = data
-      this.showPanel = false
+      this.visible.panel = false
       localSave('token', data.token)
     },
     messageResponse(data) {
@@ -247,9 +251,6 @@ export default {
         default:
           break
       }
-    },
-    togglePanel(status) {
-      this.showPanel = status
     },
   },
 }

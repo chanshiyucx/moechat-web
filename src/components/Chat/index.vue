@@ -1,6 +1,5 @@
 <template>
   <div class="chat">
-    {{ msgMq }}
     <div class="header">
       <h3>{{ chat.name }}</h3>
       <div v-if="!userInfo.tourist">
@@ -168,7 +167,7 @@ export default {
       }
     },
     login() {
-      this.$emit('togglePanel', true)
+      this.$emit('update:visible', { ...this.visible, panel: true })
     },
     handleScroll(e) {
       const $div = e.target
@@ -180,8 +179,7 @@ export default {
     handleMembers(event) {
       event.stopPropagation()
       this.getListMembers()
-      this.visible.members = true
-      this.visible.emoji = false
+      this.$emit('update:visible', { ...this.visible, members: true, emoji: false })
     },
     getListMembers() {
       if (!this.chat) return
@@ -225,8 +223,7 @@ export default {
     },
     toggleEmoji(event) {
       event.stopPropagation()
-      this.visible.emoji = !this.visible.emoji
-      this.visible.members = false
+      this.$emit('update:visible', { ...this.visible, members: false, emoji: !this.visible.emoji })
     },
     handleEmoji(emoji) {
       this.message += [emoji.val]

@@ -43,10 +43,10 @@ export default class IM {
   _onclose() {
     console.log('====== 连接关闭')
     const delay = (1 << this.reconnectCount) * 100
+    this.options.ondisconnect()
     setTimeout(() => {
       this._clearAllTimer()
       this._reconnect()
-      this.options.ondisconnect()
     }, delay)
   }
 

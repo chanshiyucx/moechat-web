@@ -58,7 +58,7 @@ export default {
     },
     // 关闭面板
     hidePanel() {
-      this.$emit('togglePanel', false)
+      this.$emit('update:showPanel', false)
     },
   },
 }

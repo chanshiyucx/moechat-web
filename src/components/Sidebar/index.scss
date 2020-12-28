@@ -8,4 +8,32 @@
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
   background-color: $primary-color-8;
+
+  .head {
+    position: relative;
+    margin-top: 10px;
+
+    .avatar {
+      cursor: pointer;
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+      vertical-align: bottom;
+    }
+
+    .dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background-color: #f60;
+      border: 2px solid $primary-color-8;
+
+      &.active {
+        background-color: #5ed45c;
+      }
+    }
+  }
 }
