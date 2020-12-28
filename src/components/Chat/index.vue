@@ -1,5 +1,5 @@
 <template>
-  <div class="chat">
+  <div id="chat">
     <div class="header">
       <h3>{{ chat.name }}</h3>
       <div v-if="!userInfo.tourist">

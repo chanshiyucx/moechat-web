@@ -1,7 +1,8 @@
 <template>
   <div id="app">
+    {{ userInfo }}
     <div :style="chatStyle">
-      <Sidebar :online="online" :userInfo="userInfo" />
+      <Sidebar :online="online" :userInfo="userInfo" @handleRequestEvent="handleRequestEvent" />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
       <Chat
         :visible.sync="visible"
@@ -101,7 +102,6 @@ export default {
     },
     msgTask() {
       setTimeout(() => {
-        console.log('msgTask')
         const newMq = {}
         Object.keys(this.msgMq).forEach((k) => {
           const item = this.msgMq[k]
@@ -184,6 +184,15 @@ export default {
     messageSuccessResponse(data) {
       delete this.msgMq[data.index]
     },
+    updateUserInfoResponse(data) {
+      const { success, message, avatar, nickname } = data
+      if (success) {
+        this.$toasted.success(message)
+        this.userInfo = { ...this.userInfo, avatar, nickname }
+      } else {
+        this.$toasted.error(message)
+      }
+    },
     setChat(chat) {
       this.chat = chat
     },
@@ -241,6 +250,9 @@ export default {
           break
         case CMD.MESSAGE_SUCCESS_RESPONSE:
           this.messageSuccessResponse(data)
+          break
+        case CMD.UPDATE_USERINFO_RESPONSE:
+          this.updateUserInfoResponse(data)
           break
         case CMD.ERROR_OPERATION_RESPONSE:
           this.$toasted.error(data.message)

@@ -12,11 +12,11 @@
             <div class="inner">注册或登录</div>
           </div>
           <div class="body" v-if="showPanel">
-            <div><b>用户名</b><input type="text" v-model="username" /></div>
-            <div><b>密码</b><input type="password" v-model="password" /></div>
+            <div><b>用户名</b><input type="text" v-model="username" minlength="3" maxlength="12" /></div>
+            <div><b>密码</b><input type="password" v-model="password" minlength="3" maxlength="12" /></div>
           </div>
           <div class="footer">
-            <div class="cursor" @click="login">注册或登录</div>
+            <button @click="login">注册或登录</button>
           </div>
         </div>
         <div class="long-line">
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { localSave, localRead } from '@/utils'
+import { localSave, localRead, validNameOrPW } from '@/utils'
 
 export default {
   name: 'Panel',
@@ -48,8 +48,7 @@ export default {
   mounted() {},
   methods: {
     login() {
-      const regex = /^[a-zA-Z0-9._-]{3,12}$/
-      if (!regex.test(this.username) || !regex.test(this.password)) {
+      if (!validNameOrPW(this.username) || !validNameOrPW(this.password)) {
         this.$toasted.error('用户名和密码必须为3-12位数字字母下划线组合！')
         return
       }

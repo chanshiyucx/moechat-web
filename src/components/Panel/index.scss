@@ -6,7 +6,8 @@
   height: 100vh;
   z-index: $zindex-4;
 
-  .mask, .container {
+  .mask,
+  .container {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -127,7 +128,7 @@
         align-items: center;
         height: 60px;
         font-size: $font-size-large;
-    
+
         b {
           display: inline-block;
           width: 50px;
@@ -144,7 +145,7 @@
           outline: none;
 
           &:focus {
-            border:1px solid $primary-color-5_5;
+            border: 1px solid $primary-color-5_5;
           }
         }
       }
@@ -158,7 +159,7 @@
       border-top: 1px solid $primary-color-5;
       background-color: $panel-bg-color;
 
-      div {
+      button {
         position: absolute;
         bottom: 0px;
         left: 50%;

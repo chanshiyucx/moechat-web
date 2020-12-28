@@ -1,5 +1,5 @@
 <template>
-  <div class="group">
+  <div id="group">
     <ul>
       <li
         v-for="it in chatList"

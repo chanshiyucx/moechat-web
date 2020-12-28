@@ -81,6 +81,12 @@ export const CMD = {
   CHAT_MESSAGE_RESPONSE: 26,
 
   /**
+   * 更新用户信息
+   */
+  UPDATE_USERINFO_REQUEST: 27,
+  UPDATE_USERINFO_RESPONSE: 28,
+
+  /**
    * 消息发送成功
    */
   MESSAGE_SUCCESS_RESPONSE: 101,

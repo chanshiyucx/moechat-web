@@ -1,4 +1,20 @@
 /**
+ * 验证用户名或密码
+ */
+export const validNameOrPW = (str) => {
+  const reg = /^[a-zA-Z0-9_]{3,12}$/
+  return reg.test(str)
+}
+
+/**
+ * 验证昵称
+ */
+export const validNickname = (str) => {
+  const reg = /^[a-zA-Z0-9_\u4e00-\u9fa5]{1,12}$/
+  return reg.test(str)
+}
+
+/**
  * 生成范围内随机整数
  */
 export const random = (a, b) => parseInt(Math.random() * (b - a + 1) + a, 10)
