@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    {{ msgMq }}
     <div :style="chatStyle">
       <Sidebar :online="online" :userInfo="userInfo" @handleRequestEvent="handleRequestEvent" />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
@@ -104,10 +105,8 @@ export default {
         const newMq = {}
         Object.keys(this.msgMq).forEach((k) => {
           const item = this.msgMq[k]
-          if (item.count < 3) {
+          if (item.count < 60) {
             item.count++
-          } else {
-            item.state = 1
           }
           newMq[k] = item
         })
@@ -195,7 +194,8 @@ export default {
     setChat(chat) {
       this.chat = chat
     },
-    sendMessage(message) {
+    async sendMessage(message, file) {
+      console.log('message file', message, file)
       if (!this.chat) return
       const { userId, nickname, avatar } = this.userInfo
       const data = {
@@ -205,9 +205,8 @@ export default {
         type: this.chat.type,
         message: JSON.stringify(message),
       }
-      const msg = { command: CMD.MESSAGE_REQUEST, data }
-      this.handleRequestEvent(msg)
 
+      // 添加到本地消息列表
       const localMsg = {
         ...data,
         message,
@@ -218,8 +217,33 @@ export default {
       const key = `${this.chat.id}_${this.chat.type}`
       this.chatMessage[key].push(localMsg)
 
-      // 设置消息状态，0 发送中，1 失败
-      this.msgMq[data.index] = { state: 0, count: 0 }
+      // 设置消息状态计数
+      this.msgMq[data.index] = { type: message.type, count: 0 }
+
+      // 上传文件
+      if (file) {
+        try {
+          const form = new FormData()
+          form.append('image', file)
+          const response = await fetch(config.imgurAPI, {
+            method: 'POST',
+            headers: {
+              Authorization: 'Client-ID ' + config.imgurID,
+            },
+            body: form,
+          })
+          const result = await response.json()
+          data.message = JSON.stringify({ ...message, url: result.data.link })
+        } catch (error) {
+          this.$toasted.error('上传失败')
+          return
+        }
+      }
+      console.log('data', data)
+
+      // 发送
+      const msg = { command: CMD.MESSAGE_REQUEST, data }
+      this.handleRequestEvent(msg)
     },
     close() {
       this.ImSocket.closeSocket()

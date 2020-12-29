@@ -93,7 +93,7 @@ export default {
         edit: false,
       },
       loading: false,
-      uploadUrl: 'https://api.imgur.com/3/image',
+      uploadUrl: config.imgurAPI,
       uploadHeaders: {
         Authorization: 'Client-ID ' + config.imgurID,
       },

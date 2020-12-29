@@ -218,7 +218,6 @@
 
       > div {
         display: inline-block;
-        margin-top: 3px;
         padding: 6px 8px;
         min-height: 28px;
         max-width: -webkit-fill-available;
@@ -234,6 +233,12 @@
         width: 28px;
         height: 28px;
       }
+
+      img {
+        cursor: zoom-in;
+        max-width: 150px;
+        vertical-align: bottom;
+      }
     }
   }
 
@@ -242,7 +247,7 @@
       &::before {
         content: '';
         position: absolute;
-        top: 23px;
+        top: 20px;
         left: 49px;
         width: 0;
         height: 0;
@@ -266,7 +271,7 @@
       &::before {
         content: '';
         position: absolute;
-        top: 23px;
+        top: 20px;
         right: 49px;
         width: 0;
         height: 0;

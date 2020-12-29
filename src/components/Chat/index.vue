@@ -17,6 +17,10 @@
           </div>
           <div class="content">
             <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
+            <div v-else-if="msg.message.type === TYPES.PICTURE">
+              <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
+              <LazyImg :src="msg.message.url" @click.native="previewImg(msg.message.url)" @onload="scrollToBottom" />
+            </div>
           </div>
         </div>
       </li>
@@ -66,15 +70,16 @@
 </template>
 
 <script>
+import * as imageConversion from 'image-conversion'
 import { CMD, TYPES, CHAT } from '@/IM'
-import config from '@/config'
 import emoji from '@/assets/emoji.json'
 import Time from '@/utils/time'
 import Avatar from '../Avatar'
+import LazyImg from '../LazyImg'
 
 export default {
   name: 'Chat',
-  components: { Avatar },
+  components: { Avatar, LazyImg },
   filters: {
     formatTime(time) {
       const messageTime = new Date(time)
@@ -152,7 +157,13 @@ export default {
   methods: {
     isFailed(index) {
       if (!index) return false
-      return this.msgMq[index] && this.msgMq[index].state === 1
+      const item = this.msgMq[index]
+      if (!item) return false
+      if (item.type === TYPES.PICTURE) {
+        return item.count > 30
+      } else {
+        return item.count > 3
+      }
     },
     scrollToBottom() {
       this.$nextTick(() => {
@@ -236,28 +247,27 @@ export default {
     handleEmoji(emoji) {
       this.message += [emoji.val]
     },
-    uploadImage(event) {
-      console.log('event', event)
-      const data = new FormData()
-      data.append('image', event.target.files[0])
-      const headers = {
-        Authorization: 'Client-ID ' + config.imgurID,
+    previewImg(url) {
+      console.log('图片预览---', url)
+      // const index = this.imgPreviewList.findIndex(src => src === source)
+      // ImagePreview({
+      //   images: this.imgPreviewList,
+      //   startPosition: index
+      // })
+    },
+    async uploadImage(event) {
+      let file = event.target.files[0]
+      const fileSize = Math.ceil(file.size / 1024)
+      const maxSize = 50
+      if (fileSize > maxSize) {
+        file = await imageConversion.compressAccurately(file, maxSize)
       }
-
-      // let config = {
-      //   header : {
-      //     'Content-Type' : 'image/png'
-      //   }
-      // }
-      // axios.put(
-      //   URL,
-      //   data,
-      //   config
-      // ).then(
-      //   response => {
-      //     console.log('image upload response > ', response)
-      //   }
-      // )
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const fileValue = e.target.result
+        this.$emit('sendMessage', { type: TYPES.PICTURE, url: fileValue }, file)
+      }
+      reader.readAsDataURL(file)
     },
   },
 }

@@ -12,6 +12,7 @@
     "bytebuffer": "^5.0.1",
     "core-js": "^3.6.5",
     "crypto-js": "^4.0.0",
+    "image-conversion": "^2.1.1",
     "vue": "^2.6.11",
     "vue-avatar-cropper": "^1.0.9",
     "vue-toasted": "^1.1.28"
