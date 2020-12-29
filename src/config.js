@@ -17,5 +17,6 @@ if (isDev) {
 export default {
   baseURL,
   imURL,
+  imgurAPI: 'https://api.imgur.com/3/image',
   imgurID: '842b0a2e058d98b',
 }

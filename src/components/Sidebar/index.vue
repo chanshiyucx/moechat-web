@@ -4,7 +4,17 @@
       <Avatar class="avatar" :userId="userInfo.sender" :avatar="userInfo.avatar" />
       <span :class="['dot', online && 'active']"></span>
     </div>
-    <ul></ul>
+    <ul>
+      <li>
+        <i class="icon icon-github-circled"></i>
+        <span>源码</span>
+      </li>
+      <li>
+        <i class="icon icon-off"></i>
+        <span>退出登录</span>
+      </li>
+    </ul>
+
     <div class="edit" v-show="visible.edit">
       <div class="head">
         <h3>个人信息设置</h3>

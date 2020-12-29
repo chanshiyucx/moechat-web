@@ -37,9 +37,16 @@
           <i class="icon icon-emo-devil" @click="toggleEmoji"></i>
         </div>
         <div class="menu">
-          <i class="icon icon-picture" @click="toggleEmoji"></i>
+          <i class="icon icon-picture"></i>
+          <input
+            id="file-input"
+            type="file"
+            title=""
+            accept="image/gif,image/png,image/jpeg"
+            @change="uploadImage($event)"
+          />
         </div>
-        <input id="inputArea" type="text" v-model="message" placeholder="说点什么吧~" maxlength="2048" />
+        <input id="message-input" type="text" v-model="message" placeholder="说点什么吧~" maxlength="2048" />
         <div class="menu">
           <i class="icon icon-paper-plane" @click="sendMessage"></i>
         </div>
@@ -60,6 +67,7 @@
 
 <script>
 import { CMD, TYPES, CHAT } from '@/IM'
+import config from '@/config'
 import emoji from '@/assets/emoji.json'
 import Time from '@/utils/time'
 import Avatar from '../Avatar'
@@ -132,8 +140,8 @@ export default {
     })
 
     // ENTER 键发送消息
-    const inputArea = document.getElementById('inputArea')
-    inputArea.onkeydown = (event) => {
+    const messageInput = document.getElementById('message-input')
+    messageInput.onkeydown = (event) => {
       const e = event || window.event
       if (e.keyCode === 13) {
         e.preventDefault()
@@ -227,6 +235,29 @@ export default {
     },
     handleEmoji(emoji) {
       this.message += [emoji.val]
+    },
+    uploadImage(event) {
+      console.log('event', event)
+      const data = new FormData()
+      data.append('image', event.target.files[0])
+      const headers = {
+        Authorization: 'Client-ID ' + config.imgurID,
+      }
+
+      // let config = {
+      //   header : {
+      //     'Content-Type' : 'image/png'
+      //   }
+      // }
+      // axios.put(
+      //   URL,
+      //   data,
+      //   config
+      // ).then(
+      //   response => {
+      //     console.log('image upload response > ', response)
+      //   }
+      // )
     },
   },
 }
