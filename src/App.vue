@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    {{ msgMq }}
     <div :style="chatStyle">
       <Sidebar :online="online" :userInfo="userInfo" @handleRequestEvent="handleRequestEvent" />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
@@ -239,7 +238,6 @@ export default {
           return
         }
       }
-      console.log('data', data)
 
       // 发送
       const msg = { command: CMD.MESSAGE_REQUEST, data }

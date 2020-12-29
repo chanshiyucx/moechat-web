@@ -1,17 +1,18 @@
 <template>
-  <img :class="className" :src="imgSrc" />
+  <div class="lazy-img">
+    <img :src="imgSrc" />
+    <Loading />
+  </div>
 </template>
 
 <script>
+import Loading from '../Loading'
 const defaultImg = require('@/assets/images/default.png')
 
 export default {
+  components: { Loading },
   props: {
     src: {
-      type: String,
-      default: '',
-    },
-    className: {
       type: String,
       default: '',
     },
@@ -46,3 +47,7 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scope>
+@import './index.scss';
+</style>

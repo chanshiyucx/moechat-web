@@ -313,5 +313,15 @@
         }
       }
     }
+
+    .loading {
+      img {
+        filter: blur(3px);
+      }
+
+      svg {
+        display: initial;
+      }
+    }
   }
 }

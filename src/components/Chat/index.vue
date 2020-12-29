@@ -10,7 +10,7 @@
     <ul ref="messageList" class="message-list i-scroll" @scroll="handleScroll">
       <li v-for="msg in messageList" :key="msg.id" :class="['msg', msg.sender === userInfo.userId ? 'me' : 'user']">
         <Avatar class="avatar" :userId="msg.sender" :avatar="msg.avatar" />
-        <div :class="['right', isFailed(msg.index) && 'failed']">
+        <div :class="['right', getClass(msg.index)]">
           <div class="info">
             <span class="nickname">{{ msg.nickname || msg.username }}</span>
             <span class="time">{{ msg.createTime | formatTime }}</span>
@@ -155,14 +155,14 @@ export default {
     }
   },
   methods: {
-    isFailed(index) {
-      if (!index) return false
+    getClass(index) {
+      if (!index) return 0
       const item = this.msgMq[index]
-      if (!item) return false
+      if (!item) return 0
       if (item.type === TYPES.PICTURE) {
-        return item.count > 30
+        return item.count > 30 ? 'failed' : 'loading'
       } else {
-        return item.count > 3
+        return item.count > 3 ? 'failed' : 'success'
       }
     },
     scrollToBottom() {
