@@ -13,6 +13,7 @@
     "core-js": "^3.6.5",
     "crypto-js": "^4.0.0",
     "vue": "^2.6.11",
+    "vue-avatar-cropper": "^1.0.9",
     "vue-toasted": "^1.1.28"
   },
   "devDependencies": {

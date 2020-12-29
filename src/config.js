@@ -17,4 +17,5 @@ if (isDev) {
 export default {
   baseURL,
   imURL,
+  imgurID: '842b0a2e058d98b',
 }

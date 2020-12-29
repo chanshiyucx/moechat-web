@@ -10,7 +10,29 @@
         <h3>个人信息设置</h3>
         <i class="icon icon-cancel-outline" @click="toggleEdit(false)"></i>
       </div>
-      <div class="body">
+      <div class="body i-scroll">
+        <div class="block">
+          <p>修改头像</p>
+          <div class="avatar-wrapper">
+            <Avatar
+              id="pick-avatar"
+              :class="['avatar', loading && 'blur']"
+              :userId="userInfo.sender"
+              :avatar="userInfo.avatar"
+            />
+            <Loading v-show="loading" />
+          </div>
+          <avatar-cropper
+            trigger="#pick-avatar"
+            upload-form-name="image"
+            :upload-url="uploadUrl"
+            :upload-headers="uploadHeaders"
+            :output-options="outputOptions"
+            @uploading="handleUploading"
+            @uploaded="handleUploaded"
+            @error="handlerError"
+          />
+        </div>
         <div class="block">
           <p>修改昵称</p>
           <input type="text" v-model="nickname" placeholder="昵称" />
@@ -36,12 +58,15 @@
 
 <script>
 import { CMD } from '@/IM'
+import config from '@/config'
+import AvatarCropper from 'vue-avatar-cropper'
 import Avatar from '../Avatar'
+import Loading from '../Loading'
 import { validNameOrPW, validNickname } from '@/utils'
 
 export default {
   name: 'Sidebar',
-  components: { Avatar },
+  components: { AvatarCropper, Avatar, Loading },
   props: {
     online: {
       type: Boolean,
@@ -56,6 +81,15 @@ export default {
     return {
       visible: {
         edit: false,
+      },
+      loading: false,
+      uploadUrl: 'https://api.imgur.com/3/image',
+      uploadHeaders: {
+        Authorization: 'Client-ID ' + config.imgurID,
+      },
+      outputOptions: {
+        width: 200,
+        height: 200,
       },
       avatar: '',
       nickname: '',
@@ -74,10 +108,37 @@ export default {
     toggleEdit(state) {
       this.visible.edit = state
     },
+    handleUploading(form, xhr) {
+      this.loading = true
+    },
+    handleUploaded(response) {
+      if (response.success) {
+        this.avatar = response.data.link
+        this.handleSure(1)
+
+        const img = new Image()
+        img.onload = img.onerror = () => {
+          this.loading = false
+        }
+        img.src = this.avatar
+      } else {
+        this.loading = false
+        this.$toasted.error('上传失败')
+      }
+    },
+    handlerError(message, type, xhr) {
+      this.loading = false
+      this.$toasted.error('上传失败')
+    },
     handleSure(type) {
       let data
       if (type === 1) {
         // 修改头像
+        if (this.avatar === '') {
+          this.$toasted.error('请先上传头像！')
+          return
+        }
+        data = { avatar: this.avatar }
       } else if (type === 2) {
         // 修改昵称
         const nickname = this.nickname.trim()
@@ -105,7 +166,6 @@ export default {
         data = { oldPassword, newPassword }
       }
       const msg = { command: CMD.UPDATE_USERINFO_REQUEST, data }
-      console.log('msg', msg)
       this.$emit('handleRequestEvent', msg)
     },
   },

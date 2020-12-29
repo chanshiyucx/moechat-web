@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    {{ userInfo }}
     <div :style="chatStyle">
       <Sidebar :online="online" :userInfo="userInfo" @handleRequestEvent="handleRequestEvent" />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
