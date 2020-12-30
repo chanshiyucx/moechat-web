@@ -137,8 +137,9 @@ export default {
       } else {
         this.calcSrcoll()
       }
+
       if (val.length) {
-        this.initViewer()
+        this.$nextTick(() => this.viewer.update())
       }
     },
     'userInfo.tourist': {
@@ -155,6 +156,8 @@ export default {
     this.emojiList = Object.keys(emoji).map((o) => {
       return { name: emoji[o], val: o }
     })
+
+    this.initViewer()
   },
   methods: {
     bindKeyBoard() {
@@ -170,12 +173,10 @@ export default {
       }
     },
     initViewer() {
-      this.$nextTick(() => {
-        new Viewer(document.querySelector('.message-list'), {
-          filter(image) {
-            return image.className.includes('img-zoomable')
-          },
-        })
+      this.viewer = new Viewer(document.querySelector('.message-list'), {
+        filter(image) {
+          return image.className.includes('img-zoomable')
+        },
       })
     },
     getClass(index) {
