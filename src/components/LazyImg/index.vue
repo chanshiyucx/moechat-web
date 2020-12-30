@@ -1,6 +1,6 @@
 <template>
   <div class="lazy-img">
-    <img :src="imgSrc" />
+    <img :class="className" :src="imgSrc" />
     <Loading />
   </div>
 </template>
@@ -12,6 +12,10 @@ const defaultImg = require('@/assets/images/default.png')
 export default {
   components: { Loading },
   props: {
+    className: {
+      type: String,
+      default: '',
+    },
     src: {
       type: String,
       default: '',

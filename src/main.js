@@ -5,6 +5,7 @@ import App from './App.vue'
 // Layout and Font
 import '@/styles/index.scss'
 import '@/assets/font/fontello.scss'
+import 'viewerjs/dist/viewer.css'
 
 Vue.config.productionTip = false
 

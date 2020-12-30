@@ -19,7 +19,7 @@
             <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
             <div v-else-if="msg.message.type === TYPES.PICTURE">
               <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
-              <LazyImg :src="msg.message.url" @click.native="previewImg(msg.message.url)" @onload="scrollToBottom" />
+              <LazyImg className="img-zoomable" :src="msg.message.url" @onload="scrollToBottom" />
             </div>
           </div>
         </div>
@@ -70,6 +70,7 @@
 </template>
 
 <script>
+import Viewer from 'viewerjs'
 import * as imageConversion from 'image-conversion'
 import { CMD, TYPES, CHAT } from '@/IM'
 import emoji from '@/assets/emoji.json'
@@ -136,6 +137,17 @@ export default {
       } else {
         this.calcSrcoll()
       }
+      if (val.length) {
+        this.initViewer()
+      }
+    },
+    'userInfo.tourist': {
+      immediate: true,
+      handler(val) {
+        if (!val) {
+          this.bindKeyBoard()
+        }
+      },
     },
   },
   mounted() {
@@ -143,18 +155,29 @@ export default {
     this.emojiList = Object.keys(emoji).map((o) => {
       return { name: emoji[o], val: o }
     })
-
-    // ENTER 键发送消息
-    const messageInput = document.getElementById('message-input')
-    messageInput.onkeydown = (event) => {
-      const e = event || window.event
-      if (e.keyCode === 13) {
-        e.preventDefault()
-        this.sendMessage()
-      }
-    }
   },
   methods: {
+    bindKeyBoard() {
+      // ENTER 键发送消息
+      const messageInput = document.getElementById('message-input')
+      if (!messageInput) return
+      messageInput.onkeydown = (event) => {
+        const e = event || window.event
+        if (e.keyCode === 13) {
+          e.preventDefault()
+          this.sendMessage()
+        }
+      }
+    },
+    initViewer() {
+      this.$nextTick(() => {
+        new Viewer(document.querySelector('.message-list'), {
+          filter(image) {
+            return image.className.includes('img-zoomable')
+          },
+        })
+      })
+    },
     getClass(index) {
       if (!index) return 0
       const item = this.msgMq[index]
@@ -246,14 +269,6 @@ export default {
     },
     handleEmoji(emoji) {
       this.message += [emoji.val]
-    },
-    previewImg(url) {
-      console.log('图片预览---', url)
-      // const index = this.imgPreviewList.findIndex(src => src === source)
-      // ImagePreview({
-      //   images: this.imgPreviewList,
-      //   startPosition: index
-      // })
     },
     async uploadImage(event) {
       let file = event.target.files[0]
