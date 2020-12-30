@@ -7,7 +7,7 @@
         @click="handleChat(it)"
         :class="it.id === chat.id && it.type === chat.type ? 'active' : ''"
       >
-        <img class="avatar" :src="it.avatar" alt />
+        <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
         <div>
           <div class="head">
             <p class="name">{{ it.name }}</p>
@@ -23,8 +23,11 @@
 </template>
 
 <script>
+import Avatar from '../Avatar'
+
 export default {
   name: 'Group',
+  components: { Avatar },
   props: {
     chatList: {
       type: Array,
