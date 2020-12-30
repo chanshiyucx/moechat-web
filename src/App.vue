@@ -169,8 +169,13 @@ export default {
           name: data.nickname,
           avatar: data.avatar,
           updateTime: data.createTime,
+          temp: true,
         }
-        this.chatList.unshift(chat)
+        // 插入到世界频道后
+        const length = this.chatList.filter((o) => o.type === CHAT.CHANNEL).length
+        this.chatList.splice(length, 1, chat)
+
+        console.log('this.chatMessage++++', this.chatMessage)
       }
     },
     listMembersResponse(data) {
@@ -241,6 +246,8 @@ export default {
       }
       const key = `${this.chat.id}_${this.chat.type}`
       this.chatMessage[key].push(localMsg)
+
+      console.log('this.chatMessage-----', this.chatMessage)
 
       // 设置消息状态计数
       this.msgMq[data.index] = { type: message.type, count: 0 }

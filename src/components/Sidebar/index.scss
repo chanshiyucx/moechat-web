@@ -29,7 +29,7 @@
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      background-color: #f60;
+      background-color: $failed;
       border: 2px solid $primary-color-8;
 
       &.active {

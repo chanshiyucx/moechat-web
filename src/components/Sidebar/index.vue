@@ -1,7 +1,8 @@
 <template>
   <div id="sidebar">
     <div v-if="!userInfo.tourist" class="header" @click="toggleEdit(true)">
-      <Avatar class="avatar" :userId="userInfo.sender" :avatar="userInfo.avatar" />
+      {{ userInfo.sender }}
+      <Avatar class="avatar" :userId="userInfo.userId" :avatar="userInfo.avatar" />
       <span :class="['dot', online && 'active']"></span>
     </div>
     <ul>

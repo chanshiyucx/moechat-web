@@ -233,12 +233,30 @@ export default {
       event.stopPropagation()
       if (!this.chat) return
       if (this.chat.type === CHAT.USER) {
-        this.option = 'remove'
-        this.friend = this.chat
+        if (this.chat.temp) {
+          this.handleMember({ ...this.chat, userId: this.chat.id, nickname: this.chat.name })
+        } else {
+          this.option = 'remove'
+          this.friend = this.chat
+        }
       } else {
         this.getListMembers()
         this.$emit('update:visible', { ...this.visible, members: true, emoji: false })
       }
+    },
+    handleMember(user) {
+      if (user.tourist) return
+      if (user.userId === this.userInfo.userId) return
+      this.option = 'add'
+      this.friend = user
+    },
+    handleFriend() {
+      if (!this.friend) return
+      const data = { userId: this.friend.userId || this.friend.id }
+      const command = this.option === 'add' ? CMD.ADD_FRIEND_REQUEST : CMD.REMOVE_FRIEND_REQUEST
+      const msg = { command, data }
+      this.$emit('handleRequestEvent', msg)
+      this.friend = ''
     },
     getListMembers() {
       const data = { id: this.chat.id, type: this.chat.type }
@@ -299,20 +317,6 @@ export default {
         this.$emit('sendMessage', { type: TYPES.PICTURE, url: fileValue }, file)
       }
       reader.readAsDataURL(file)
-    },
-    handleMember(user) {
-      if (user.tourist) return
-      if (user.userId === this.userInfo.userId) return
-      this.option = 'add'
-      this.friend = user
-    },
-    handleFriend() {
-      if (!this.friend) return
-      const data = { userId: this.friend.userId || this.friend.id }
-      const command = this.option === 'add' ? CMD.ADD_FRIEND_REQUEST : CMD.REMOVE_FRIEND_REQUEST
-      const msg = { command, data }
-      this.$emit('handleRequestEvent', msg)
-      this.friend = ''
     },
   },
 }
