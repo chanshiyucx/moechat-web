@@ -11,7 +11,7 @@
         <div>
           <div class="head">
             <p class="name">{{ it.name }}</p>
-            <p class="time">15:18</p>
+            <p class="time">{{ it.updateTime | formatTime }}</p>
           </div>
           <div class="preview">
             <p>摸鱼打卡</p>

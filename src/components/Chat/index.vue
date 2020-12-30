@@ -4,7 +4,7 @@
       <h3>{{ chat.name }}</h3>
       <div v-if="!userInfo.tourist">
         <i class="icon icon-share" @click="handleShare"></i>
-        <i class="icon icon-users" @click="handleMembers"></i>
+        <i class="icon icon-users" @click="handleMenu"></i>
       </div>
     </div>
     <ul ref="messageList" class="message-list i-scroll" @scroll="handleScroll">
@@ -82,7 +82,9 @@
           <i class="icon icon-cancel-outline" @click="friend = ''"></i>
         </div>
         <div class="footer">
-          <button @click="addFriend">加为好友</button>
+          <button :class="option === 'remove' && 'red'" @click="handleFriend">
+            {{ option === 'add' ? '加为好友' : '删除好友' }}
+          </button>
         </div>
       </div>
     </div>
@@ -94,26 +96,12 @@ import Viewer from 'viewerjs'
 import * as imageConversion from 'image-conversion'
 import { CMD, TYPES, CHAT } from '@/IM'
 import emoji from '@/assets/emoji.json'
-import Time from '@/utils/time'
 import Avatar from '../Avatar'
 import LazyImg from '../LazyImg'
 
 export default {
   name: 'Chat',
   components: { Avatar, LazyImg },
-  filters: {
-    formatTime(time) {
-      const messageTime = new Date(time)
-      const nowTime = new Date()
-      if (Time.isToday(nowTime, messageTime)) {
-        return Time.getHourMinute(messageTime)
-      }
-      if (Time.isYesterday(nowTime, messageTime)) {
-        return `昨天${Time.getHourMinute(messageTime)}`
-      }
-      return `${Time.getMonthDate(messageTime)} ${Time.getHourMinute(messageTime)}`
-    },
-  },
   props: {
     visible: {
       type: Object,
@@ -147,6 +135,7 @@ export default {
       emojiList: [],
       isFetching: false,
       toBottom: false,
+      option: '',
       friend: '',
       message: '',
     }
@@ -240,13 +229,18 @@ export default {
       }
     },
     handleShare() {},
-    handleMembers(event) {
+    handleMenu(event) {
       event.stopPropagation()
-      this.getListMembers()
-      this.$emit('update:visible', { ...this.visible, members: true, emoji: false })
+      if (!this.chat) return
+      if (this.chat.type === CHAT.USER) {
+        this.option = 'remove'
+        this.friend = this.chat
+      } else {
+        this.getListMembers()
+        this.$emit('update:visible', { ...this.visible, members: true, emoji: false })
+      }
     },
     getListMembers() {
-      if (!this.chat) return
       const data = { id: this.chat.id, type: this.chat.type }
       const msg = { command: CMD.LIST_MEMBERS_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
@@ -309,12 +303,14 @@ export default {
     handleMember(user) {
       if (user.tourist) return
       if (user.userId === this.userInfo.userId) return
+      this.option = 'add'
       this.friend = user
     },
-    addFriend() {
+    handleFriend() {
       if (!this.friend) return
-      const data = { userId: this.friend.userId }
-      const msg = { command: CMD.ADD_FRIEND_REQUEST, data }
+      const data = { userId: this.friend.userId || this.friend.id }
+      const command = this.option === 'add' ? CMD.ADD_FRIEND_REQUEST : CMD.REMOVE_FRIEND_REQUEST
+      const msg = { command, data }
       this.$emit('handleRequestEvent', msg)
       this.friend = ''
     },

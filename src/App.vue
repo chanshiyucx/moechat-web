@@ -20,7 +20,7 @@
 
 <script>
 import config from './config'
-import IM, { CMD } from '@/IM'
+import IM, { CMD, CHAT } from '@/IM'
 import Sidebar from '@/components/Sidebar'
 import Group from '@/components/Group'
 import Chat from '@/components/Chat'
@@ -155,10 +155,22 @@ export default {
     },
     messageResponse(data) {
       data.message = JSON.parse(data.message)
-      const key = `${data.receiver}_${data.type}`
+      const key = `${data.type === CHAT.USER ? data.sender : data.receiver}_${data.type}`
       const list = this.chatMessage[key]
       if (list) {
+        // 添加到已有队列
         list.push(data)
+      } else {
+        // 添加新聊天列表
+        this.chatMessage[key] = [data]
+        const chat = {
+          id: data.sender,
+          type: data.type,
+          name: data.nickname,
+          avatar: data.avatar,
+          updateTime: data.createTime,
+        }
+        this.chatList.unshift(chat)
       }
     },
     listMembersResponse(data) {
@@ -209,7 +221,6 @@ export default {
       this.chat = chat
     },
     async sendMessage(message, file) {
-      console.log('message file', message, file)
       if (!this.chat) return
       const { userId, nickname, avatar } = this.userInfo
       const data = {
