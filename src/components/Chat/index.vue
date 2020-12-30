@@ -57,14 +57,34 @@
       </div>
     </div>
     <div :class="['members', visible.members && 'show']">
-      <div class="head">
-        <p class="title">群组信息</p>
+      <p class="title">群组信息</p>
+      <div class="content">
+        <div class="block">
+          <p class="subtitle">在线成员 {{ listMembers.length }}</p>
+          <ul class="i-scroll">
+            <li v-for="user in listMembers" :key="user.id">
+              <div @click="handleMember(user)">
+                <Avatar class="avatar" :userId="user.id" :avatar="user.avatar" />
+                <p>{{ user.nickname }}</p>
+              </div>
+              <p>{{ user.device }}</p>
+            </li>
+          </ul>
+        </div>
       </div>
-      <ul>
-        <li v-for="user in listMembers" :key="user.id">
-          {{ user.nickname }}
-        </li>
-      </ul>
+    </div>
+    <div class="friend" v-show="friend">
+      <div class="mask" @click="friend = ''"></div>
+      <div class="content">
+        <div class="head">
+          <Avatar class="avatar" :userId="friend.id" :avatar="friend.avatar" />
+          <p>{{ friend.nickname }}</p>
+          <i class="icon icon-cancel-outline" @click="friend = ''"></i>
+        </div>
+        <div class="footer">
+          <button @click="addFriend">加为好友</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -127,6 +147,7 @@ export default {
       emojiList: [],
       isFetching: false,
       toBottom: false,
+      friend: '',
       message: '',
     }
   },
@@ -284,6 +305,18 @@ export default {
         this.$emit('sendMessage', { type: TYPES.PICTURE, url: fileValue }, file)
       }
       reader.readAsDataURL(file)
+    },
+    handleMember(user) {
+      if (user.tourist) return
+      if (user.userId === this.userInfo.userId) return
+      this.friend = user
+    },
+    addFriend() {
+      if (!this.friend) return
+      const data = { userId: this.friend.userId }
+      const msg = { command: CMD.ADD_FRIEND_REQUEST, data }
+      this.$emit('handleRequestEvent', msg)
+      this.friend = ''
     },
   },
 }

@@ -1,3 +1,5 @@
+import UAParser from 'ua-parser-js'
+
 const UA = window.navigator.userAgent
 
 export const isiOS = /iPhone/i.test(UA)
@@ -38,4 +40,12 @@ export const getHeightPercent = () => {
     height = 0.8
   }
   return height
+}
+
+/**
+ * 获取设置信息
+ */
+export const getDeviceInfo = () => {
+  const result = new UAParser().getResult()
+  return `${result.browser.name}${result.browser.major} ${result.os.name}${result.os.version}`
 }

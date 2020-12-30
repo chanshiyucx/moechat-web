@@ -21,11 +21,11 @@
 <script>
 import config from './config'
 import IM, { CMD } from '@/IM'
-import { getWidthPercent, getHeightPercent } from '@/utils/device'
 import Sidebar from '@/components/Sidebar'
 import Group from '@/components/Group'
 import Chat from '@/components/Chat'
 import Panel from '@/components/Panel'
+import { getWidthPercent, getHeightPercent, getDeviceInfo } from '@/utils/device'
 import { localSave, localRead, localRemove } from '@/utils'
 
 export default {
@@ -34,6 +34,7 @@ export default {
   data() {
     return {
       ImSocket: null,
+      device: getDeviceInfo(),
       width: getWidthPercent(),
       height: getHeightPercent(),
       visible: {
@@ -87,6 +88,10 @@ export default {
     handleClick(event) {
       const eventDom = event.target
 
+      // 添加好友弹窗
+      const friendDom = document.querySelector('.friend')
+      if (friendDom && (eventDom === friendDom || friendDom.contains(eventDom))) return
+
       // emoji 弹框
       const emojiDom = document.querySelector('.emoji-box')
       if (emojiDom && !(eventDom === emojiDom || emojiDom.contains(eventDom))) {
@@ -125,7 +130,7 @@ export default {
     login(user = {}) {
       const msg = {
         command: CMD.LOGIN_REQUEST,
-        data: { ...user, token: localRead('token') },
+        data: { ...user, token: localRead('token'), device: this.device },
       }
       this.handleRequestEvent(msg)
     },
