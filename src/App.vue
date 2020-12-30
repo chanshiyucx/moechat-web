@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div :style="chatStyle">
-      <Sidebar :online="online" :userInfo="userInfo" @handleRequestEvent="handleRequestEvent" />
+      <Sidebar :online="online" :userInfo="userInfo" @logout="logout" @handleRequestEvent="handleRequestEvent" />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
       <Chat
         :visible.sync="visible"
@@ -26,7 +26,7 @@ import Sidebar from '@/components/Sidebar'
 import Group from '@/components/Group'
 import Chat from '@/components/Chat'
 import Panel from '@/components/Panel'
-import { localSave, localRead } from '@/utils'
+import { localSave, localRead, localRemove } from '@/utils'
 
 export default {
   name: 'App',
@@ -128,6 +128,16 @@ export default {
         data: { ...user, token: localRead('token') },
       }
       this.handleRequestEvent(msg)
+    },
+    logout() {
+      this.close()
+      this.online = false
+      this.userInfo = {}
+      localRemove('token')
+      this.init()
+    },
+    close() {
+      this.ImSocket.closeSocket()
     },
     ondisconnect() {
       this.online = false
@@ -242,9 +252,6 @@ export default {
       // 发送
       const msg = { command: CMD.MESSAGE_REQUEST, data }
       this.handleRequestEvent(msg)
-    },
-    close() {
-      this.ImSocket.closeSocket()
     },
     handleRequestEvent(msg) {
       this.ImSocket.handleRequestEvent(msg)

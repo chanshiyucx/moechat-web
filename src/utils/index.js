@@ -59,3 +59,10 @@ export const localSave = (key, value) => {
 export const localRead = (key, defaultValue = '') => {
   return localStorage.getItem(key) || defaultValue
 }
+
+/**
+ * 读取移除
+ */
+export const localRemove = (key) => {
+  return localStorage.removeItem(key)
+}

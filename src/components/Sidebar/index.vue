@@ -6,11 +6,11 @@
     </div>
     <ul>
       <li>
-        <i class="icon icon-github-circled"></i>
+        <i class="icon icon-github-circled" @click="handleMenu('code')"></i>
         <span>源码</span>
       </li>
       <li>
-        <i class="icon icon-off"></i>
+        <i class="icon icon-off" @click="handleMenu('logout')"></i>
         <span>退出登录</span>
       </li>
     </ul>
@@ -177,6 +177,18 @@ export default {
       }
       const msg = { command: CMD.UPDATE_USERINFO_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
+    },
+    handleMenu(option) {
+      switch (option) {
+        case 'code':
+          window.open('https://github.com/chanshiyucx/moechat', '_blank')
+          break
+        case 'logout':
+          this.$emit('logout')
+          break
+        default:
+          break
+      }
     },
   },
 }
