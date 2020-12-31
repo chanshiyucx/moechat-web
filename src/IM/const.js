@@ -87,6 +87,12 @@ export const CMD = {
   UPDATE_USERINFO_RESPONSE: 28,
 
   /**
+   * 统计分析
+   */
+  STATISTICS_REQUEST: 29,
+  STATISTICS_RESPONSE: 30,
+
+  /**
    * 消息发送成功
    */
   MESSAGE_SUCCESS_RESPONSE: 101,

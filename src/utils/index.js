@@ -47,6 +47,21 @@ export const parseTime = (time, format = '{y}-{m}-{d} {h}:{i}:{s}') => {
 }
 
 /**
+ * 计算距当前时间差
+ */
+export const diffTime = (dateBegin) => {
+  const dateDiff = Date.now() - dateBegin
+  const days = Math.floor(dateDiff / (24 * 3600 * 1000))
+  const leave1 = dateDiff % (24 * 3600 * 1000)
+  const hours = Math.floor(leave1 / (3600 * 1000))
+  const leave2 = leave1 % (3600 * 1000)
+  const minutes = Math.floor(leave2 / (60 * 1000))
+  const leave3 = leave2 % (60 * 1000)
+  const seconds = Math.round(leave3 / 1000)
+  return `${days}天${hours}小时${minutes}分钟${seconds}秒`
+}
+
+/**
  * 写入缓存
  */
 export const localSave = (key, value) => {

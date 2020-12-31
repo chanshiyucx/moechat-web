@@ -1,7 +1,13 @@
 <template>
   <div id="app">
     <div :style="chatStyle">
-      <Sidebar :online="online" :userInfo="userInfo" @logout="logout" @handleRequestEvent="handleRequestEvent" />
+      <Sidebar
+        :online="online"
+        :userInfo="userInfo"
+        :statistics="statistics"
+        @logout="logout"
+        @handleRequestEvent="handleRequestEvent"
+      />
       <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
       <Chat
         :visible.sync="visible"
@@ -26,7 +32,7 @@ import Group from '@/components/Group'
 import Chat from '@/components/Chat'
 import Panel from '@/components/Panel'
 import { getWidthPercent, getHeightPercent, getDeviceInfo } from '@/utils/device'
-import { localSave, localRead, localRemove } from '@/utils'
+import { localSave, localRead, localRemove, diffTime } from '@/utils'
 
 export default {
   name: 'App',
@@ -50,6 +56,7 @@ export default {
       chatMessage: {},
       index: 0,
       msgMq: {},
+      statistics: {},
     }
   },
   created() {
@@ -174,8 +181,6 @@ export default {
         // 插入到世界频道后
         const length = this.chatList.filter((o) => o.type === CHAT.CHANNEL).length
         this.chatList.splice(length, 1, chat)
-
-        console.log('this.chatMessage++++', this.chatMessage)
       }
     },
     listMembersResponse(data) {
@@ -222,6 +227,19 @@ export default {
         this.$toasted.error(message)
       }
     },
+    statisticsResponse(data) {
+      data.startTime = new Date(data.startDate).getTime()
+      data.diffTime = diffTime(data.startTime)
+      this.statistics = data
+      clearTimeout(this.statisticsTimer)
+      this.statisticsTask()
+    },
+    statisticsTask() {
+      this.statisticsTimer = setTimeout(() => {
+        this.statistics.diffTime = diffTime(this.statistics.startTime)
+        this.statisticsTask()
+      }, 1000)
+    },
     setChat(chat) {
       this.chat = chat
     },
@@ -246,8 +264,6 @@ export default {
       }
       const key = `${this.chat.id}_${this.chat.type}`
       this.chatMessage[key].push(localMsg)
-
-      console.log('this.chatMessage-----', this.chatMessage)
 
       // 设置消息状态计数
       this.msgMq[data.index] = { type: message.type, count: 0 }
@@ -304,6 +320,9 @@ export default {
           break
         case CMD.UPDATE_USERINFO_RESPONSE:
           this.updateUserInfoResponse(data)
+          break
+        case CMD.STATISTICS_RESPONSE:
+          this.statisticsResponse(data)
           break
         case CMD.ERROR_OPERATION_RESPONSE:
           this.$toasted.error(data.message)

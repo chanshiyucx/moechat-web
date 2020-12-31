@@ -1,7 +1,6 @@
 <template>
   <div id="sidebar">
     <div v-if="!userInfo.tourist" class="header" @click="toggleEdit(true)">
-      {{ userInfo.sender }}
       <Avatar class="avatar" :userId="userInfo.userId" :avatar="userInfo.avatar" />
       <span :class="['dot', online && 'active']"></span>
     </div>
@@ -11,56 +10,79 @@
         <span>源码</span>
       </li>
       <li>
+        <i class="icon icon-info" @click="handleMenu('statistics')"></i>
+        <span>关于</span>
+      </li>
+      <li>
         <i class="icon icon-off" @click="handleMenu('logout')"></i>
         <span>退出登录</span>
       </li>
     </ul>
 
-    <div class="edit" v-show="visible.edit">
-      <div class="head">
-        <h3>个人信息设置</h3>
-        <i class="icon icon-cancel-outline" @click="toggleEdit(false)"></i>
-      </div>
-      <div class="body i-scroll">
-        <div class="block">
-          <p>修改头像</p>
-          <div class="avatar-wrapper">
-            <Avatar
-              id="pick-avatar"
-              :class="['avatar', loading && 'blur']"
-              :userId="userInfo.sender"
-              :avatar="userInfo.avatar"
+    <div class="edit dialog" v-show="visible.edit">
+      <div class="mask" @click="toggleEdit(false)"></div>
+      <div class="content">
+        <div class="head">
+          <h3>个人信息设置</h3>
+          <i class="icon icon-cancel-outline" @click="toggleEdit(false)"></i>
+        </div>
+        <div class="body i-scroll">
+          <div class="block">
+            <p>修改头像</p>
+            <div class="avatar-wrapper">
+              <Avatar
+                id="pick-avatar"
+                :class="['avatar', loading && 'blur']"
+                :userId="userInfo.sender"
+                :avatar="userInfo.avatar"
+              />
+              <Loading v-show="loading" />
+            </div>
+            <avatar-cropper
+              trigger="#pick-avatar"
+              upload-form-name="image"
+              :upload-url="uploadUrl"
+              :upload-headers="uploadHeaders"
+              :output-options="outputOptions"
+              @uploading="handleUploading"
+              @uploaded="handleUploaded"
+              @error="handlerError"
             />
-            <Loading v-show="loading" />
           </div>
-          <avatar-cropper
-            trigger="#pick-avatar"
-            upload-form-name="image"
-            :upload-url="uploadUrl"
-            :upload-headers="uploadHeaders"
-            :output-options="outputOptions"
-            @uploading="handleUploading"
-            @uploaded="handleUploaded"
-            @error="handlerError"
-          />
+          <div class="block">
+            <p>修改昵称</p>
+            <input type="text" v-model="nickname" placeholder="昵称" />
+            <button @click="handleSure(2)">确认修改</button>
+          </div>
+          <div class="block">
+            <p>修改密码</p>
+            <input
+              type="password"
+              v-model="oldPassword"
+              placeholder="旧密码"
+              minlength="3"
+              maxlength="12"
+              autocomplete="new-password"
+            />
+            <input type="password" v-model="newPassword" placeholder="新密码" minlength="3" maxlength="12" />
+            <button @click="handleSure(3)">确认修改</button>
+          </div>
         </div>
-        <div class="block">
-          <p>修改昵称</p>
-          <input type="text" v-model="nickname" placeholder="昵称" />
-          <button @click="handleSure(2)">确认修改</button>
+      </div>
+    </div>
+
+    <div class="statistics dialog" v-show="visible.statistics">
+      <div class="mask" @click="toggleStatittics(false)"></div>
+      <div class="content">
+        <div class="head">
+          <h3>关于</h3>
+          <i class="icon icon-cancel-outline" @click="toggleStatittics(false)"></i>
         </div>
-        <div class="block">
-          <p>修改密码</p>
-          <input
-            type="password"
-            v-model="oldPassword"
-            placeholder="旧密码"
-            minlength="3"
-            maxlength="12"
-            autocomplete="new-password"
-          />
-          <input type="password" v-model="newPassword" placeholder="新密码" minlength="3" maxlength="12" />
-          <button @click="handleSure(3)">确认修改</button>
+        <div class="body">
+          <p>萌聊已经萌萌哒运行了{{ statistics.diffTime }}<span class="my-face">(●'◡'●)ﾉ♥</span></p>
+          <p>总共注册用户{{ statistics.totalRegisterUser }}人，发送消息{{ statistics.totalSendMessage }}条。</p>
+          <p>今日注册用户{{ statistics.todayRegisterUser }}人，发送消息{{ statistics.todaySendMessage }}条。</p>
+          <p>Made with by <a href="https://github.com/chanshiyucx" target="_blank">蝉时雨</a>.</p>
         </div>
       </div>
     </div>
@@ -87,11 +109,16 @@ export default {
       type: Object,
       default: () => {},
     },
+    statistics: {
+      type: Object,
+      default: () => {},
+    },
   },
   data() {
     return {
       visible: {
         edit: false,
+        statistics: false,
       },
       loading: false,
       uploadUrl: config.imgurAPI,
@@ -118,6 +145,9 @@ export default {
   methods: {
     toggleEdit(state) {
       this.visible.edit = state
+    },
+    toggleStatittics(state) {
+      this.visible.statistics = state
     },
     handleUploading(form, xhr) {
       this.loading = true
@@ -184,12 +214,20 @@ export default {
         case 'code':
           window.open('https://github.com/chanshiyucx/moechat', '_blank')
           break
+        case 'statistics':
+          this.handleStatistics()
+          break
         case 'logout':
           this.$emit('logout')
           break
         default:
           break
       }
+    },
+    handleStatistics() {
+      const msg = { command: CMD.STATISTICS_REQUEST, data: {} }
+      this.$emit('handleRequestEvent', msg)
+      this.visible.statistics = true
     },
   },
 }

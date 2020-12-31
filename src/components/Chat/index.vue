@@ -3,7 +3,7 @@
     <div class="header">
       <h3>{{ chat.name }}</h3>
       <div v-if="!userInfo.tourist">
-        <i class="icon icon-share" @click="handleShare"></i>
+        <i v-if="chat.type === CHAT.GROUP" class="icon icon-share" @click="handleShare"></i>
         <i class="icon icon-users" @click="handleMenu"></i>
       </div>
     </div>
@@ -131,6 +131,7 @@ export default {
   data() {
     return {
       TYPES,
+      CHAT,
       emoji,
       emojiList: [],
       isFetching: false,
@@ -228,7 +229,13 @@ export default {
         this.getChatMessage()
       }
     },
-    handleShare() {},
+    handleShare() {
+      if (!this.chat) return
+      if (this.chat.type !== CHAT.GROUP) return
+      console.log('this.chat', this.chat)
+      // invite::fiora
+      // const invite =
+    },
     handleMenu(event) {
       event.stopPropagation()
       if (!this.chat) return

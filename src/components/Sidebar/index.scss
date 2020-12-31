@@ -97,17 +97,33 @@
     }
   }
 
-  .edit {
+  .dialog {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 500px;
-    height: auto;
-    overflow: hidden;
-    z-index: $zindex-4;
-    border-radius: 6px;
-    background-color: #fff;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: $zindex-3;
+
+    .mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(55, 55, 55, 0.6);
+    }
+
+    .content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 500px;
+      height: auto;
+      border-radius: 6px;
+      background-color: #fff;
+      transform: translate(-50%, -50%);
+    }
 
     .head {
       display: flex;
@@ -124,9 +140,13 @@
 
     .body {
       padding: 20px;
-      max-height: 60vh;
+      max-height: 70vh;
       overflow-y: auto;
+    }
+  }
 
+  .edit {
+    .body {
       p {
         margin-bottom: 4px;
         line-height: 22px;
@@ -153,6 +173,10 @@
 
       .block {
         margin-bottom: 20px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
 
         > button {
           width: 100px;
@@ -183,6 +207,22 @@
           border: 1px solid rgba(0, 0, 0, 0.2);
         }
       }
+    }
+  }
+
+  .statistics {
+    p {
+      line-height: 2.2;
+      letter-spacing: 0.5px;
+    }
+    .my-face {
+      display: inline-block;
+      margin: 0 5px;
+      animation: my-face 5s infinite ease-in-out;
+    }
+
+    a {
+      color: $failed;
     }
   }
 }
