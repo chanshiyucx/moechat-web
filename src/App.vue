@@ -8,7 +8,13 @@
         @logout="logout"
         @handleRequestEvent="handleRequestEvent"
       />
-      <Group :chatList="chatList" :chat="chat" :search.sync="visible.search" @setChat="setChat" />
+      <Group
+        :chatList="chatList"
+        :chat="chat"
+        :search.sync="visible.search"
+        @setChat="setChat"
+        @handleRequestEvent="handleRequestEvent"
+      />
       <Chat
         :visible.sync="visible"
         :userInfo="userInfo"
