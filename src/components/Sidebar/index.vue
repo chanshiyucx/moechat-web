@@ -33,7 +33,7 @@
               <Avatar
                 id="pick-avatar"
                 :class="['avatar', loading && 'blur']"
-                :userId="userInfo.sender"
+                :userId="userInfo.userId"
                 :avatar="userInfo.avatar"
               />
               <Loading v-show="loading" />
@@ -95,7 +95,7 @@ import config from '@/config'
 import AvatarCropper from 'vue-avatar-cropper'
 import Avatar from '../Avatar'
 import Loading from '../Loading'
-import { validNameOrPW, validNickname } from '@/utils'
+import { validNameOrPW, validContent } from '@/utils'
 
 export default {
   name: 'Sidebar',
@@ -183,7 +183,7 @@ export default {
       } else if (type === 2) {
         // 修改昵称
         const nickname = this.nickname.trim()
-        if (!validNickname(nickname)) {
+        if (!validContent(nickname)) {
           this.$toasted.error('昵称必须为1-12位中文数字字母下划线组合！')
           return
         }

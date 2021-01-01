@@ -43,12 +43,6 @@
       "src": "typicons"
     },
     {
-      "uid": "74b2f1d1ee541715b3f389f7cdf63d1c",
-      "css": "logout-1",
-      "code": 59396,
-      "src": "websymbols"
-    },
-    {
       "uid": "4dd56d61fd0dab19277824da301424b3",
       "css": "emo-devil",
       "code": 59397,
@@ -94,6 +88,12 @@
       "uid": "381da2c2f7fd51f8de877c044d7f439d",
       "css": "picture",
       "code": 59404,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "4ba33d2607902cf690dd45df09774cb0",
+      "css": "plus-circled",
+      "code": 59405,
       "src": "fontawesome"
     }
   ]

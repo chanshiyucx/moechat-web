@@ -7,9 +7,9 @@ export const validNameOrPW = (str) => {
 }
 
 /**
- * 验证昵称
+ * 验证合法名称
  */
-export const validNickname = (str) => {
+export const validContent = (str) => {
   const reg = /^[a-zA-Z0-9_\u4e00-\u9fa5]{1,12}$/
   return reg.test(str)
 }

@@ -8,7 +8,7 @@
         @logout="logout"
         @handleRequestEvent="handleRequestEvent"
       />
-      <Group :chatList="chatList" :chat="chat" @setChat="setChat" />
+      <Group :chatList="chatList" :chat="chat" :search.sync="visible.search" @setChat="setChat" />
       <Chat
         :visible.sync="visible"
         :userInfo="userInfo"
@@ -47,6 +47,7 @@ export default {
         members: false,
         emoji: false,
         panel: false,
+        search: false,
       },
       online: false,
       userInfo: {},
@@ -99,7 +100,7 @@ export default {
       const friendDom = document.querySelector('.friend')
       if (friendDom && (eventDom === friendDom || friendDom.contains(eventDom))) return
 
-      // emoji 弹框
+      // emoji 弹窗
       const emojiDom = document.querySelector('.emoji-box')
       if (emojiDom && !(eventDom === emojiDom || emojiDom.contains(eventDom))) {
         this.visible.emoji = false
@@ -109,6 +110,12 @@ export default {
       const membersDom = document.querySelector('.members')
       if (membersDom && !(eventDom === membersDom || membersDom.contains(eventDom))) {
         this.visible.members = false
+      }
+
+      // 搜索弹窗
+      const searchDom = document.querySelector('.search')
+      if (searchDom && !(eventDom === searchDom || searchDom.contains(eventDom))) {
+        this.visible.search = false
       }
     },
     msgTask() {
