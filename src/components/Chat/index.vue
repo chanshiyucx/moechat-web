@@ -66,6 +66,7 @@
             <button @click="handleSure(1)">确认修改</button>
           </div>
           <div class="block">
+            <p class="subtitle">修改群头像</p>
             <div class="avatar-wrapper">
               <Avatar id="chat-avatar" :class="['avatar', loading && 'blur']" :userId="chat.id" :avatar="chat.avatar" />
               <Loading v-show="loading" />
