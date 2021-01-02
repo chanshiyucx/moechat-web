@@ -131,15 +131,15 @@
   .members {
     position: absolute;
     top: 0;
-    right: 0;
+    right: -100%;
     height: 100%;
     width: 300px;
     background-color: #fff;
-    transform: translateX(100%);
-    transition: transform 0.5s ease-in-out;
+    will-change: right;
+    transition: right 0.6s ease-out;
 
     &.show {
-      transform: translateX(0);
+      right: 0;
     }
 
     .title {
@@ -159,11 +159,61 @@
     }
 
     .block {
+      margin-bottom: 20px;
       .subtitle {
         line-height: 33px;
         font-size: 14px;
         color: #333;
         font-weight: bold;
+      }
+
+      > button {
+        width: 90px;
+        height: 32px;
+        font-size: 14px;
+        color: $primary-text-color-10;
+        border-radius: 4px;
+        background-color: $primary-color-8_5;
+      }
+
+      .name-input {
+        margin-bottom: 8px;
+        padding: 0 12px;
+        width: 100%;
+        height: 32px;
+        line-height: 32px;
+        color: #333;
+        font-size: 14px;
+        user-select: auto;
+        border-radius: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+
+        &:focus {
+          border: 1px solid $primary-color-5_5;
+        }
+      }
+
+      .avatar-wrapper {
+        position: relative;
+        width: min-content;
+
+        .avatar {
+          cursor: pointer;
+          width: 100px;
+          height: 100px;
+          border-radius: 5px;
+        }
+      }
+
+      .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .blur {
+        filter: blur(3px);
       }
 
       li {
@@ -175,18 +225,18 @@
           cursor: pointer;
           display: flex;
         }
-      }
 
-      .avatar {
-        margin-right: 10px;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-      }
+        .avatar {
+          margin-right: 10px;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+        }
 
-      p {
-        line-height: 30px;
-        font-size: 13px;
+        p {
+          line-height: 30px;
+          font-size: 13px;
+        }
       }
     }
   }

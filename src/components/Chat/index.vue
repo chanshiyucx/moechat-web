@@ -59,10 +59,29 @@
     <div :class="['members', visible.members && 'show']">
       <p class="title">群组信息</p>
       <div class="content">
+        <template v-if="chatInfo.type === CHAT.GROUP && chatInfo.createUser === userInfo.username">
+          <div class="block">
+            <p class="subtitle">修改群名称</p>
+            <input class="name-input" type="text" v-model="nickname" placeholder="请输入群名称" />
+            <button @click="handleSure(1)">确认修改</button>
+          </div>
+          <div class="block">
+            <div class="avatar-wrapper">
+              <Avatar id="chat-avatar" :class="['avatar', loading && 'blur']" :userId="chat.id" :avatar="chat.avatar" />
+              <Loading v-show="loading" />
+            </div>
+            <Cropper
+              trigger="#chat-avatar"
+              @uploading="handleUploading"
+              @uploaded="handleUploaded"
+              @error="handlerError"
+            />
+          </div>
+        </template>
         <div class="block">
-          <p class="subtitle">在线成员 {{ listMembers.length }}</p>
+          <p class="subtitle">在线成员 {{ chatInfo.userList.length }}</p>
           <ul class="i-scroll">
-            <li v-for="user in listMembers" :key="user.id">
+            <li v-for="user in chatInfo.userList" :key="user.id">
               <div @click="handleMember(user)">
                 <Avatar class="avatar" :userId="user.id" :avatar="user.avatar" />
                 <p>{{ user.nickname }}</p>
@@ -97,11 +116,14 @@ import * as imageConversion from 'image-conversion'
 import { CMD, TYPES, CHAT } from '@/IM'
 import emoji from '@/assets/emoji.json'
 import Avatar from '../Avatar'
+import Loading from '../Loading'
 import LazyImg from '../LazyImg'
+import Cropper from '../Cropper'
+import { validContent } from '@/utils'
 
 export default {
   name: 'Chat',
-  components: { Avatar, LazyImg },
+  components: { Avatar, Loading, LazyImg, Cropper },
   props: {
     visible: {
       type: Object,
@@ -115,9 +137,9 @@ export default {
       type: Object,
       default: () => {},
     },
-    listMembers: {
-      type: Array,
-      default: () => [],
+    chatInfo: {
+      type: Object,
+      default: () => {},
     },
     messageList: {
       type: Array,
@@ -134,11 +156,14 @@ export default {
       CHAT,
       emoji,
       emojiList: [],
+      loading: false,
       isFetching: false,
       toBottom: false,
       option: '',
       friend: '',
       message: '',
+      avatar: '',
+      nickname: '',
     }
   },
   watch: {
@@ -160,6 +185,10 @@ export default {
           this.bindKeyBoard()
         }
       },
+    },
+    chat(val) {
+      this.avatar = val.avatar
+      this.nickname = val.name
     },
   },
   mounted() {
@@ -247,7 +276,7 @@ export default {
           this.friend = this.chat
         }
       } else {
-        this.getListMembers()
+        this.getChatInfo()
         this.$emit('update:visible', { ...this.visible, members: true, emoji: false })
       }
     },
@@ -265,9 +294,9 @@ export default {
       this.$emit('handleRequestEvent', msg)
       this.friend = ''
     },
-    getListMembers() {
+    getChatInfo() {
       const data = { id: this.chat.id, type: this.chat.type }
-      const msg = { command: CMD.LIST_MEMBERS_REQUEST, data }
+      const msg = { command: CMD.CHAT_INFO_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
     },
     getChatMessage() {
@@ -324,6 +353,49 @@ export default {
         this.$emit('sendMessage', { type: TYPES.PICTURE, url: fileValue }, file)
       }
       reader.readAsDataURL(file)
+    },
+    handleUploading(form, xhr) {
+      this.loading = true
+    },
+    handleUploaded(response) {
+      if (response.success) {
+        this.avatar = response.data.link
+        this.handleSure(2)
+
+        const img = new Image()
+        img.onload = img.onerror = () => {
+          this.loading = false
+        }
+        img.src = this.avatar
+      } else {
+        this.loading = false
+        this.$toasted.error('上传失败')
+      }
+    },
+    handlerError(message, type, xhr) {
+      this.loading = false
+      this.$toasted.error('上传失败')
+    },
+    handleSure(type) {
+      let data = { id: this.chat.id }
+      if (type === 1) {
+        // 修改昵称
+        const nickname = this.nickname.trim()
+        if (!validContent(nickname)) {
+          this.$toasted.error('群名称必须为1-12位中文数字字母下划线组合！')
+          return
+        }
+        data.name = nickname
+      } else if (type === 2) {
+        // 修改头像
+        if (this.avatar === '') {
+          this.$toasted.error('请先上传头像！')
+          return
+        }
+        data.avatar = this.avatar
+      }
+      const msg = { command: CMD.UPDATE_GROUP_REQUEST, data }
+      this.$emit('handleRequestEvent', msg)
     },
   },
 }

@@ -1,15 +1,15 @@
 <template>
   <div id="group">
     <div class="search">
-      <form :class="['search-form', search && 'focus']">
+      <form :class="['search-form', visible.search && 'focus']">
         <i class="icon icon-search"></i>
         <input ref="searchInput" type="text" @focus="onFocus" v-model="content" placeholder="搜索群组/用户" />
         <i class="icon icon-cancel-outline" @click="handleClear"></i>
       </form>
-      <div v-show="!search" class="add">
+      <div v-show="!visible.search" class="add">
         <i class="icon icon-plus-circled" @click="toggleGroup(true)"></i>
       </div>
-      <div v-show="search" class="search-result">
+      <div v-show="visible.search" class="search-result">
         <div class="head">
           <ul>
             <li @click="tab = 1">全部</li>
@@ -44,7 +44,7 @@
         </div>
       </div>
     </div>
-    <ul class="chat-list">
+    <ul class="chat-list i-scroll">
       <li
         v-for="it in chatList"
         :key="`${it.type}_${it.id}`"
@@ -83,16 +83,13 @@ export default {
       type: Object,
       defalt: () => {},
     },
-    search: {
-      type: Boolean,
-      defalt: false,
+    visible: {
+      type: Object,
+      defalt: () => {},
     },
   },
   data() {
     return {
-      visible: {
-        group: false,
-      },
       result: [],
       tab: 1,
       content: '',
@@ -104,7 +101,7 @@ export default {
       this.$emit('setChat', chat)
     },
     onFocus() {
-      this.$emit('update:search', true)
+      this.$emit('update:visible', { ...this.visible, search: true })
     },
     handleClear() {
       this.content = ''
@@ -113,7 +110,7 @@ export default {
     },
     toggleGroup(state) {
       this.group = ''
-      this.visible.group = state
+      this.$emit('update:visible', { ...this.visible, group: state })
     },
     handleCreateGroup() {
       const name = this.group.trim()

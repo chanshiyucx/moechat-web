@@ -11,7 +11,7 @@
       <Group
         :chatList="chatList"
         :chat="chat"
-        :search.sync="visible.search"
+        :visible.sync="visible"
         @setChat="setChat"
         @handleRequestEvent="handleRequestEvent"
       />
@@ -19,7 +19,7 @@
         :visible.sync="visible"
         :userInfo="userInfo"
         :chat="chat"
-        :listMembers="listMembers"
+        :chatInfo="chatInfo"
         :messageList="messageList"
         :msgMq="msgMq"
         @sendMessage="sendMessage"
@@ -54,12 +54,13 @@ export default {
         emoji: false,
         panel: false,
         search: false,
+        group: false,
       },
       online: false,
       userInfo: {},
       chatList: [],
       chat: {},
-      listMembers: [],
+      chatInfo: { userList: [] },
       chatMessage: {},
       index: 0,
       msgMq: {},
@@ -196,9 +197,12 @@ export default {
         this.chatList.splice(length, 1, chat)
       }
     },
-    listMembersResponse(data) {
+    createGroupResponse(data) {
+      this.visible.group = false
+    },
+    chatInfoResponse(data) {
       if (data.id === this.chat.id && data.type === this.chat.type) {
-        this.listMembers = data.userList
+        this.chatInfo = data
       }
     },
     chatHistoryResponse(data) {
@@ -231,11 +235,24 @@ export default {
     messageSuccessResponse(data) {
       delete this.msgMq[data.index]
     },
-    updateUserInfoResponse(data) {
+    updateUserResponse(data) {
       const { success, message, avatar, nickname } = data
       if (success) {
         this.$toasted.success(message)
         this.userInfo = { ...this.userInfo, avatar, nickname }
+      } else {
+        this.$toasted.error(message)
+      }
+    },
+    updateGroupResponse(data) {
+      const { success, message, avatar, name } = data
+      if (success) {
+        this.$toasted.success(message)
+        const chat = this.chatList.find((o) => o.type === CHAT.GROUP && o.id === data.id)
+        if (chat) {
+          avatar && this.$set(chat, 'avatar', avatar)
+          name && this.$set(chat, 'name', name)
+        }
       } else {
         this.$toasted.error(message)
       }
@@ -316,8 +333,11 @@ export default {
         case CMD.MESSAGE_RESPONSE:
           this.messageResponse(data)
           break
-        case CMD.LIST_MEMBERS_RESPONSE:
-          this.listMembersResponse(data)
+        case CMD.CREATE_GROUP_RESPONSE:
+          this.createGroupResponse(data)
+          break
+        case CMD.CHAT_INFO_RESPONSE:
+          this.chatInfoResponse(data)
           break
         case CMD.CHAT_HISTORY_RESPONSE:
           this.chatHistoryResponse(data)
@@ -331,8 +351,11 @@ export default {
         case CMD.MESSAGE_SUCCESS_RESPONSE:
           this.messageSuccessResponse(data)
           break
-        case CMD.UPDATE_USERINFO_RESPONSE:
-          this.updateUserInfoResponse(data)
+        case CMD.UPDATE_USER_RESPONSE:
+          this.updateUserResponse(data)
+          break
+        case CMD.UPDATE_GROUP_RESPONSE:
+          this.updateGroupResponse(data)
           break
         case CMD.STATISTICS_RESPONSE:
           this.statisticsResponse(data)

@@ -38,12 +38,8 @@
               />
               <Loading v-show="loading" />
             </div>
-            <avatar-cropper
+            <Cropper
               trigger="#pick-avatar"
-              upload-form-name="image"
-              :upload-url="uploadUrl"
-              :upload-headers="uploadHeaders"
-              :output-options="outputOptions"
               @uploading="handleUploading"
               @uploaded="handleUploaded"
               @error="handlerError"
@@ -91,15 +87,14 @@
 
 <script>
 import { CMD } from '@/IM'
-import config from '@/config'
-import AvatarCropper from 'vue-avatar-cropper'
 import Avatar from '../Avatar'
 import Loading from '../Loading'
+import Cropper from '../Cropper'
 import { validNameOrPW, validContent } from '@/utils'
 
 export default {
   name: 'Sidebar',
-  components: { AvatarCropper, Avatar, Loading },
+  components: { Cropper, Avatar, Loading },
   props: {
     online: {
       type: Boolean,
@@ -121,14 +116,6 @@ export default {
         statistics: false,
       },
       loading: false,
-      uploadUrl: config.imgurAPI,
-      uploadHeaders: {
-        Authorization: 'Client-ID ' + config.imgurID,
-      },
-      outputOptions: {
-        width: 200,
-        height: 200,
-      },
       avatar: '',
       nickname: '',
       oldPassword: '',
@@ -206,7 +193,7 @@ export default {
         }
         data = { oldPassword, newPassword }
       }
-      const msg = { command: CMD.UPDATE_USERINFO_REQUEST, data }
+      const msg = { command: CMD.UPDATE_USER_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
     },
     handleMenu(option) {

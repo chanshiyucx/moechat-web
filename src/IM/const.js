@@ -59,8 +59,8 @@ export const CMD = {
   /**
    * 群成员
    */
-  LIST_MEMBERS_REQUEST: 19,
-  LIST_MEMBERS_RESPONSE: 20,
+  CHAT_INFO_REQUEST: 19,
+  CHAT_INFO_RESPONSE: 20,
 
   /**
    * 聊天列表
@@ -83,14 +83,20 @@ export const CMD = {
   /**
    * 更新用户信息
    */
-  UPDATE_USERINFO_REQUEST: 27,
-  UPDATE_USERINFO_RESPONSE: 28,
+  UPDATE_USER_REQUEST: 27,
+  UPDATE_USER_RESPONSE: 28,
+
+  /**
+   * 更新群组信息
+   */
+  UPDATE_GROUP_REQUEST: 29,
+  UPDATE_GROUP_RESPONSE: 30,
 
   /**
    * 统计分析
    */
-  STATISTICS_REQUEST: 29,
-  STATISTICS_RESPONSE: 30,
+  STATISTICS_REQUEST: 31,
+  STATISTICS_RESPONSE: 32,
 
   /**
    * 消息发送成功

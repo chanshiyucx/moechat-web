@@ -179,8 +179,8 @@
         }
 
         > button {
-          width: 100px;
-          height: 36px;
+          width: 90px;
+          height: 32px;
           font-size: 14px;
           color: $primary-text-color-10;
           border-radius: 4px;
@@ -205,6 +205,10 @@
           user-select: auto;
           border-radius: 6px;
           border: 1px solid rgba(0, 0, 0, 0.2);
+
+          &:focus {
+            border: 1px solid $primary-color-5_5;
+          }
         }
       }
     }
@@ -229,27 +233,4 @@
       color: $failed;
     }
   }
-}
-
-.avatar-cropper-close {
-  display: none;
-}
-
-.avatar-cropper-btn {
-  font-size: 16px;
-  letter-spacing: 1px;
-
-  &:hover {
-    background-color: $primary-color-8_5 !important;
-  }
-}
-
-.cropper-view-box {
-  outline: 1px solid $primary-color-8;
-  outline-color: $primary-color-8_5;
-}
-
-.cropper-line,
-.cropper-point {
-  background-color: $primary-color-8_5;
 }
