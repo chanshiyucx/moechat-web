@@ -25,7 +25,7 @@
         </div>
       </li>
     </ul>
-    <div class="footer">
+    <div class="chat-footer">
       <p v-if="userInfo.tourist" class="guest">
         游客朋友你好, 请<b class="guestLogin" role="button" @click="login">登录</b>后参与聊天
       </p>
@@ -59,25 +59,44 @@
     <div :class="['members', visible.members && 'show']">
       <p class="title">群组信息</p>
       <div class="content">
-        <template v-if="chatInfo.type === CHAT.GROUP && chatInfo.createUser === userInfo.username">
-          <div class="block">
-            <p class="subtitle">修改群名称</p>
-            <input class="name-input" type="text" v-model="nickname" placeholder="请输入群名称" />
-            <button @click="handleSure(1)">确认修改</button>
-          </div>
-          <div class="block">
-            <p class="subtitle">修改群头像</p>
-            <div class="avatar-wrapper">
-              <Avatar id="chat-avatar" :class="['avatar', loading && 'blur']" :userId="chat.id" :avatar="chat.avatar" />
-              <Loading v-show="loading" />
+        <template v-if="chatInfo.type === CHAT.GROUP">
+          <template v-if="chatInfo.createUser === userInfo.username">
+            <div>
+              <div class="block">
+                <p class="subtitle">功能</p>
+                <button class="red" @click="toggleQuit(true)">解散群组</button>
+              </div>
+              <div class="block">
+                <p class="subtitle">修改群名称</p>
+                <input class="name-input" type="text" v-model="nickname" placeholder="请输入群名称" />
+                <button @click="handleSure(1)">确认修改</button>
+              </div>
+              <div class="block">
+                <p class="subtitle">修改群头像</p>
+                <div class="avatar-wrapper">
+                  <Avatar
+                    id="chat-avatar"
+                    :class="['avatar', loading && 'blur']"
+                    :userId="chat.id"
+                    :avatar="chat.avatar"
+                  />
+                  <Loading v-show="loading" />
+                </div>
+                <Cropper
+                  trigger="#chat-avatar"
+                  @uploading="handleUploading"
+                  @uploaded="handleUploaded"
+                  @error="handlerError"
+                />
+              </div>
             </div>
-            <Cropper
-              trigger="#chat-avatar"
-              @uploading="handleUploading"
-              @uploaded="handleUploaded"
-              @error="handlerError"
-            />
-          </div>
+          </template>
+          <template v-else>
+            <div class="block">
+              <p class="subtitle">功能</p>
+              <button @click="handleQuit">退出群组</button>
+            </div>
+          </template>
         </template>
         <div class="block">
           <p class="subtitle">在线成员 {{ chatInfo.userList.length }}</p>
@@ -93,7 +112,7 @@
         </div>
       </div>
     </div>
-    <div class="friend" v-show="friend">
+    <div class="friend dialog" v-show="friend">
       <div class="mask" @click="friend = ''"></div>
       <div class="content">
         <div class="head">
@@ -105,6 +124,23 @@
           <button :class="option === 'remove' && 'red'" @click="handleFriend">
             {{ option === 'add' ? '加为好友' : '删除好友' }}
           </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="quit dialog" v-show="quit">
+      <div class="mask" @click="toggleQuit(false)"></div>
+      <div class="content">
+        <div class="head">
+          <h3>解散群组</h3>
+          <i class="icon icon-cancel-outline" @click="toggleQuit(false)"></i>
+        </div>
+        <div class="body">
+          <p>再次确认解散群组？该操作无法撤销！</p>
+          <div class="footer">
+            <button @click="toggleQuit(false)">取消</button>
+            <button class="red" @click="handleQuit">确认</button>
+          </div>
         </div>
       </div>
     </div>
@@ -160,6 +196,7 @@ export default {
       loading: false,
       isFetching: false,
       toBottom: false,
+      quit: false,
       option: '',
       friend: '',
       message: '',
@@ -397,6 +434,15 @@ export default {
       }
       const msg = { command: CMD.UPDATE_GROUP_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
+    },
+    toggleQuit(state) {
+      this.quit = state
+    },
+    handleQuit() {
+      const data = { id: this.chat.id }
+      const msg = { command: CMD.QUIT_GROUP_REQUEST, data }
+      this.$emit('handleRequestEvent', msg)
+      this.quit = false
     },
   },
 }

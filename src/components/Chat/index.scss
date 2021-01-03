@@ -26,7 +26,7 @@
     }
   }
 
-  .footer {
+  .chat-footer {
     display: flex;
     align-items: center;
     padding: 0px 20px;
@@ -174,6 +174,10 @@
         color: $primary-text-color-10;
         border-radius: 4px;
         background-color: $primary-color-8_5;
+
+        &.red {
+          background-color: $failed;
+        }
       }
 
       .name-input {
@@ -236,6 +240,76 @@
         p {
           line-height: 30px;
           font-size: 13px;
+        }
+      }
+    }
+  }
+
+  .friend {
+    .content {
+      width: 300px;
+    }
+
+    .head {
+      padding: 20px 0 14px 0;
+      background-color: #f0f2f5;
+      text-align: center;
+
+      .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+      }
+
+      .icon {
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 18px;
+        color: #888;
+      }
+    }
+
+    .footer {
+      padding: 30px 20px 20px;
+      button {
+        width: 100%;
+        height: 34px;
+        font-size: 14px;
+        border-radius: 4px;
+        letter-spacing: 1px;
+        color: $primary-text-color-10;
+        background-color: $primary-color-8_5;
+
+        &.red {
+          background-color: $failed;
+        }
+      }
+    }
+  }
+
+  .quit {
+    .content {
+      width: 400px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 20px;
+
+      button {
+        margin-left: 12px;
+        width: 66px;
+        height: 34px;
+        font-size: 14px;
+        border-radius: 4px;
+        letter-spacing: 1px;
+        color: $primary-text-color-10;
+        background-color: $primary-color-8_5;
+        &.red {
+          background-color: $failed;
         }
       }
     }
@@ -398,73 +472,6 @@
       svg {
         display: initial;
       }
-    }
-  }
-}
-
-.friend {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-
-  .mask {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(55, 55, 55, 0.6);
-  }
-
-  .content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300px;
-    height: auto;
-    overflow: hidden;
-    z-index: $zindex-4;
-    border-radius: 6px;
-    background-color: #fff;
-    transform: translate(-50%, -50%);
-  }
-
-  .head {
-    padding: 20px 0 14px 0;
-    background-color: #f0f2f5;
-    text-align: center;
-
-    .avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-    }
-
-    .icon {
-      cursor: pointer;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 18px;
-      color: #888;
-    }
-  }
-
-  .footer {
-    padding: 30px 20px 20px;
-    button {
-      width: 100%;
-      height: 34px;
-      font-size: 14px;
-      border-radius: 4px;
-      letter-spacing: 1px;
-      color: $primary-text-color-10;
-      background-color: $primary-color-8_5;
-    }
-    .red {
-      background-color: $failed;
     }
   }
 }

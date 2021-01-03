@@ -107,6 +107,10 @@ export default {
       const friendDom = document.querySelector('.friend')
       if (friendDom && (eventDom === friendDom || friendDom.contains(eventDom))) return
 
+      // 解散群组
+      const dissolveDom = document.querySelector('.dissolve')
+      if (dissolveDom && (eventDom === dissolveDom || dissolveDom.contains(eventDom))) return
+
       // emoji 弹窗
       const emojiDom = document.querySelector('.emoji-box')
       if (emojiDom && !(eventDom === emojiDom || emojiDom.contains(eventDom))) {

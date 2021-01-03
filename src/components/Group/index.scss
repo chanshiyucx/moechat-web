@@ -136,52 +136,13 @@
   }
 
   .dialog {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: $zindex-3;
-
-    .mask {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(55, 55, 55, 0.6);
-    }
-
     .content {
-      position: absolute;
-      top: 40%;
-      left: 50%;
       width: 400px;
-      height: auto;
-      border-radius: 6px;
-      background-color: #fff;
-      transform: translate(-50%, -50%);
-    }
-
-    .head {
-      display: flex;
-      padding: 12px 20px;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e9e9e9;
-
-      i {
-        cursor: pointer;
-        font-size: 20px;
-      }
     }
 
     .body {
       display: flex;
       flex-direction: column;
-      padding: 20px;
-      max-height: 70vh;
-      overflow-y: auto;
     }
 
     input {
