@@ -50,7 +50,14 @@
             @change="uploadImage($event)"
           />
         </div>
-        <input id="message-input" type="text" v-model="message" placeholder="说点什么吧~" maxlength="2048" />
+        <input
+          id="message-input"
+          type="text"
+          v-model="message"
+          placeholder="说点什么吧~"
+          maxlength="2048"
+          @keyup.enter="sendMessage"
+        />
         <div class="menu">
           <i class="icon icon-paper-plane" @click="sendMessage"></i>
         </div>
@@ -105,6 +112,7 @@
               <div @click="handleMember(user)">
                 <Avatar class="avatar" :userId="user.id" :avatar="user.avatar" />
                 <p>{{ user.nickname }}</p>
+                <p class="label" v-if="chatInfo.createUser === user.username">群主</p>
               </div>
               <p>{{ user.device }}</p>
             </li>
@@ -216,14 +224,6 @@ export default {
         this.$nextTick(() => this.viewer.update())
       }
     },
-    'userInfo.tourist': {
-      immediate: true,
-      handler(val) {
-        if (!val) {
-          this.bindKeyBoard()
-        }
-      },
-    },
     chat(val) {
       this.avatar = val.avatar
       this.nickname = val.name
@@ -238,18 +238,6 @@ export default {
     this.initViewer()
   },
   methods: {
-    bindKeyBoard() {
-      // ENTER 键发送消息
-      const messageInput = document.getElementById('message-input')
-      if (!messageInput) return
-      messageInput.onkeydown = (event) => {
-        const e = event || window.event
-        if (e.keyCode === 13) {
-          e.preventDefault()
-          this.sendMessage()
-        }
-      }
-    },
     initViewer() {
       this.viewer = new Viewer(document.querySelector('.message-list'), {
         filter(image) {

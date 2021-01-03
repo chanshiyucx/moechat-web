@@ -93,10 +93,16 @@ export const CMD = {
   UPDATE_GROUP_RESPONSE: 30,
 
   /**
+   * 搜索
+   */
+  SEARCH_REQUEST: 31,
+  SEARCH_RESPONSE: 32,
+
+  /**
    * 统计分析
    */
-  STATISTICS_REQUEST: 31,
-  STATISTICS_RESPONSE: 32,
+  STATISTICS_REQUEST: 33,
+  STATISTICS_RESPONSE: 34,
 
   /**
    * 消息发送成功

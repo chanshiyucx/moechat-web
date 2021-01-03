@@ -1,11 +1,18 @@
 <template>
   <div id="group">
     <div class="search">
-      <form :class="['search-form', visible.search && 'focus']">
+      <div :class="['search-form', visible.search && 'focus']">
         <i class="icon icon-search"></i>
-        <input ref="searchInput" type="text" @focus="onFocus" v-model="content" placeholder="搜索群组/用户" />
+        <input
+          ref="searchInput"
+          type="text"
+          v-model="content"
+          @focus="onFocus"
+          @keyup.enter="handleSearch"
+          placeholder="搜索群组/用户"
+        />
         <i class="icon icon-cancel-outline" @click="handleClear"></i>
-      </form>
+      </div>
       <div v-show="!visible.search" class="add">
         <i class="icon icon-plus-circled" @click="toggleGroup(true)"></i>
       </div>
@@ -119,6 +126,12 @@ export default {
         return
       }
       const msg = { command: CMD.CREATE_GROUP_REQUEST, data: { name } }
+      this.$emit('handleRequestEvent', msg)
+    },
+    handleSearch() {
+      const search = this.content.trim()
+      if (search === '') return
+      const msg = { command: CMD.SEARCH_REQUEST, data: { keyword: search } }
       this.$emit('handleRequestEvent', msg)
     },
   },
