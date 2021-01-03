@@ -26,14 +26,56 @@
           <div :class="['line', `line-${tab}`]"></div>
         </div>
         <ul :class="['result', `result-${tab}`]">
-          <li>
-            <p>没有搜索到内容, 换个关键字试试吧~~</p>
+          <li :class="['i-scroll', tab === 1 && 'active']">
+            <div v-if="searchResult.length">
+              <div v-if="searchUser.length">
+                <p class="subtitle">用户</p>
+                <ul>
+                  <li class="item" v-for="it in searchUser.slice(0, 3)" :key="`${it.type}_${it.id}`">
+                    <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
+                    <p>{{ it.name }}</p>
+                  </li>
+                </ul>
+                <p v-if="searchUser.length > 3" @click="tab = 2">查看更多</p>
+              </div>
+              <div v-if="searchGroup.length">
+                <p class="subtitle">群组</p>
+                <ul>
+                  <li class="item" v-for="it in searchGroup.slice(0, 3)" :key="`${it.type}_${it.id}`">
+                    <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
+                    <p>{{ it.name }}</p>
+                  </li>
+                </ul>
+                <p v-if="searchGroup.length > 3" @click="tab = 3">查看更多</p>
+              </div>
+            </div>
+            <p v-else>没有搜索到内容, 换个关键字试试吧~~</p>
           </li>
-          <li>
-            <p>没有搜索到内容, 换个关键字试试吧~~</p>
+          <li :class="['i-scroll', tab === 2 && 'active']">
+            <div v-if="searchUser.length">
+              <div v-if="searchUser.length">
+                <ul>
+                  <li class="item" v-for="it in searchUser" :key="`${it.type}_${it.id}`">
+                    <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
+                    <p>{{ it.name }}</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <p v-else>没有搜索到内容, 换个关键字试试吧~~</p>
           </li>
-          <li>
-            <p>没有搜索到内容, 换个关键字试试吧~~</p>
+          <li :class="['i-scroll', tab === 3 && 'active']">
+            <div v-if="searchGroup.length">
+              <div v-if="searchGroup.length">
+                <ul>
+                  <li class="item" v-for="it in searchGroup" :key="`${it.type}_${it.id}`">
+                    <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
+                    <p>{{ it.name }}</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <p v-else>没有搜索到内容, 换个关键字试试吧~~</p>
           </li>
         </ul>
       </div>
@@ -74,7 +116,7 @@
 </template>
 
 <script>
-import { CMD } from '@/IM'
+import { CMD, CHAT } from '@/IM'
 import Avatar from '../Avatar'
 import { validContent } from '@/utils'
 
@@ -82,6 +124,10 @@ export default {
   name: 'Group',
   components: { Avatar },
   props: {
+    visible: {
+      type: Object,
+      defalt: () => {},
+    },
     chatList: {
       type: Array,
       defalt: () => [],
@@ -90,9 +136,9 @@ export default {
       type: Object,
       defalt: () => {},
     },
-    visible: {
-      type: Object,
-      defalt: () => {},
+    searchResult: {
+      type: Array,
+      defalt: () => [],
     },
   },
   data() {
@@ -102,6 +148,14 @@ export default {
       content: '',
       group: '',
     }
+  },
+  computed: {
+    searchUser() {
+      return this.searchResult.filter((it) => it.type === CHAT.USER)
+    },
+    searchGroup() {
+      return this.searchResult.filter((it) => it.type === CHAT.GROUP)
+    },
   },
   methods: {
     handleChat(chat) {

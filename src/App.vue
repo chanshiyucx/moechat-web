@@ -9,9 +9,10 @@
         @handleRequestEvent="handleRequestEvent"
       />
       <Group
+        :visible.sync="visible"
         :chatList="chatList"
         :chat="chat"
-        :visible.sync="visible"
+        :searchResult="searchResult"
         @setChat="setChat"
         @handleRequestEvent="handleRequestEvent"
       />
@@ -65,6 +66,7 @@ export default {
       index: 0,
       msgMq: {},
       statistics: {},
+      searchResult: [],
     }
   },
   created() {
@@ -261,6 +263,9 @@ export default {
         this.$toasted.error(message)
       }
     },
+    searchResponse(data) {
+      this.searchResult = data.chatList
+    },
     statisticsResponse(data) {
       data.startTime = new Date(data.startDate).getTime()
       data.diffTime = diffTime(data.startTime)
@@ -360,6 +365,9 @@ export default {
           break
         case CMD.UPDATE_GROUP_RESPONSE:
           this.updateGroupResponse(data)
+          break
+        case CMD.SEARCH_RESPONSE:
+          this.searchResponse(data)
           break
         case CMD.STATISTICS_RESPONSE:
           this.statisticsResponse(data)
