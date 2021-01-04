@@ -342,8 +342,8 @@ export default {
         this.isFetching = false
       }, 2000)
 
-      const lastMsg = this.messageList[this.messageList.length - 1]
-      const data = { id: this.chat.id, type: this.chat.type, index: lastMsg ? lastMsg.index : 0 }
+      const lastMsg = this.messageList[0]
+      const data = { id: this.chat.id, type: this.chat.type, index: lastMsg ? lastMsg.id : 0 }
       const msg = { command: CMD.CHAT_MESSAGE_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
     },
