@@ -204,8 +204,32 @@ export default {
         this.chatList.splice(length, 1, chat)
       }
     },
+    addFriendResponse(data) {
+      const { success, message, userId } = data
+      if (data.success) {
+        this.$toasted.success(message)
+        const chat = this.chatList.find((o) => o.type === CHAT.USER && o.id === userId)
+        if (chat) {
+          this.chat = chat
+        }
+      } else {
+        this.$toasted.error(message)
+      }
+    },
     createGroupResponse(data) {
       this.visible.group = false
+    },
+    joinGroupResponse(data) {
+      const { success, message, groupId } = data
+      if (data.success) {
+        this.$toasted.success(message)
+        const chat = this.chatList.find((o) => o.type === CHAT.GROUP && o.id === groupId)
+        if (chat) {
+          this.chat = chat
+        }
+      } else {
+        this.$toasted.error(message)
+      }
     },
     chatInfoResponse(data) {
       if (data.id === this.chat.id && data.type === this.chat.type) {
@@ -343,8 +367,14 @@ export default {
         case CMD.MESSAGE_RESPONSE:
           this.messageResponse(data)
           break
+        case CMD.ADD_FRIEND_RESPONSE:
+          this.addFriendResponse(data)
+          break
         case CMD.CREATE_GROUP_RESPONSE:
           this.createGroupResponse(data)
+          break
+        case CMD.JOIN_GROUP_RESPONSE:
+          this.joinGroupResponse(data)
           break
         case CMD.CHAT_INFO_RESPONSE:
           this.chatInfoResponse(data)

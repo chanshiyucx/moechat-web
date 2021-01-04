@@ -406,6 +406,21 @@
         max-width: 150px;
         vertical-align: bottom;
       }
+
+      .invite {
+        text-align: center;
+
+        p {
+          line-height: 3.6;
+        }
+
+        .join {
+          cursor: pointer;
+          letter-spacing: 1px;
+          line-height: 2.4;
+          border: 2px dashed #eee;
+        }
+      }
     }
   }
 

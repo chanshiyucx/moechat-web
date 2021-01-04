@@ -3,7 +3,7 @@
     <div class="header">
       <h3>{{ chat.name }}</h3>
       <div v-if="!userInfo.tourist">
-        <i v-if="chat.type === CHAT.GROUP" class="icon icon-share" @click="handleShare"></i>
+        <i v-if="chat.type === CHAT.GROUP" id="share" class="icon icon-share"></i>
         <i class="icon icon-users" @click="handleMenu"></i>
       </div>
     </div>
@@ -18,8 +18,11 @@
           <div class="content">
             <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
             <div v-else-if="msg.message.type === TYPES.PICTURE">
-              <div v-if="msg.message.type === TYPES.TEXT" v-html="toHtml(msg.message.text)"></div>
               <LazyImg className="img-zoomable" :src="msg.message.url" @onload="scrollToBottom" />
+            </div>
+            <div v-else-if="msg.message.type === TYPES.INVITE" class="invite">
+              <p>【{{ chat.name }}】邀请你加入群组【{{ msg.message.text }}】</p>
+              <p class="join" @click="joinGroup(msg.message.id)">加入</p>
             </div>
           </div>
         </div>
@@ -101,7 +104,7 @@
           <template v-else>
             <div class="block">
               <p class="subtitle">功能</p>
-              <button @click="handleQuit">退出群组</button>
+              <button class="red" @click="handleQuit">退出群组</button>
             </div>
           </template>
         </template>
@@ -158,6 +161,7 @@
 
 <script>
 import Viewer from 'viewerjs'
+import ClipboardJS from 'clipboard'
 import * as imageConversion from 'image-conversion'
 import { CMD, TYPES, CHAT } from '@/IM'
 import emoji from '@/assets/emoji.json'
@@ -237,6 +241,7 @@ export default {
     })
 
     this.initViewer()
+    this.initClipboard()
   },
   methods: {
     initViewer() {
@@ -244,6 +249,16 @@ export default {
         filter(image) {
           return image.className.includes('img-zoomable')
         },
+      })
+    },
+    initClipboard() {
+      const clipboard = new ClipboardJS('#share', {
+        text: () => {
+          return `invite::${this.chat.id}::${this.chat.name}`
+        },
+      })
+      clipboard.on('success', () => {
+        this.$toasted.success('已复制邀请信息到粘贴板, 去邀请其它人加群吧')
       })
     },
     getClass(index) {
@@ -284,13 +299,6 @@ export default {
       if ($div.scrollTop === 0 && $div.scrollHeight > $div.clientHeight) {
         this.getChatMessage()
       }
-    },
-    handleShare() {
-      if (!this.chat) return
-      if (this.chat.type !== CHAT.GROUP) return
-      console.log('this.chat', this.chat)
-      // invite::fiora
-      // const invite =
     },
     handleMenu(event) {
       event.stopPropagation()
@@ -343,7 +351,17 @@ export default {
       if (message === '') {
         return this.$toasted.error('请说点什么吧')
       }
-      this.$emit('sendMessage', { type: TYPES.TEXT, text: message })
+
+      let msg = { type: TYPES.TEXT, text: message }
+      // 判断是否为邀请链接
+      if (message.startsWith('invite')) {
+        const arr = message.split('::')
+        if (arr.length === 3) {
+          msg = { type: TYPES.INVITE, id: arr[1], text: arr[2] }
+        }
+      }
+
+      this.$emit('sendMessage', msg)
       this.message = ''
       this.toBottom = true
     },
@@ -432,6 +450,10 @@ export default {
       const msg = { command: CMD.QUIT_GROUP_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
       this.quit = false
+    },
+    joinGroup(groupId) {
+      const msg = { command: CMD.JOIN_GROUP_REQUEST, data: { groupId } }
+      this.$emit('handleRequestEvent', msg)
     },
   },
 }
