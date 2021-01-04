@@ -11,7 +11,7 @@
           @keyup.enter="handleSearch"
           placeholder="搜索群组/用户"
         />
-        <i class="icon icon-cancel-outline" @click="handleClear"></i>
+        <i class="icon icon-cancel-outline" @click="handleClear(true)"></i>
       </div>
       <div v-show="!visible.search" class="add">
         <i class="icon icon-plus-circled" @click="toggleGroup(true)"></i>
@@ -31,22 +31,32 @@
               <div v-if="searchUser.length">
                 <p class="subtitle">用户</p>
                 <ul>
-                  <li class="item" v-for="it in searchUser.slice(0, 3)" :key="`${it.type}_${it.id}`">
+                  <li
+                    class="item"
+                    v-for="it in searchUser.slice(0, 3)"
+                    :key="`${it.type}_${it.id}`"
+                    @click="handleMember(it)"
+                  >
                     <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
                     <p>{{ it.name }}</p>
                   </li>
                 </ul>
-                <p v-if="searchUser.length > 3" @click="tab = 2">查看更多</p>
+                <p class="more" v-if="searchUser.length > 3" @click="tab = 2">查看更多</p>
               </div>
               <div v-if="searchGroup.length">
                 <p class="subtitle">群组</p>
                 <ul>
-                  <li class="item" v-for="it in searchGroup.slice(0, 3)" :key="`${it.type}_${it.id}`">
+                  <li
+                    class="item"
+                    v-for="it in searchGroup.slice(0, 3)"
+                    :key="`${it.type}_${it.id}`"
+                    @click="handleMember(it)"
+                  >
                     <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
                     <p>{{ it.name }}</p>
                   </li>
                 </ul>
-                <p v-if="searchGroup.length > 3" @click="tab = 3">查看更多</p>
+                <p class="more" v-if="searchGroup.length > 3" @click="tab = 3">查看更多</p>
               </div>
             </div>
             <p v-else>没有搜索到内容, 换个关键字试试吧~~</p>
@@ -55,7 +65,7 @@
             <div v-if="searchUser.length">
               <div v-if="searchUser.length">
                 <ul>
-                  <li class="item" v-for="it in searchUser" :key="`${it.type}_${it.id}`">
+                  <li class="item" v-for="it in searchUser" :key="`${it.type}_${it.id}`" @click="handleMember(it)">
                     <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
                     <p>{{ it.name }}</p>
                   </li>
@@ -68,7 +78,7 @@
             <div v-if="searchGroup.length">
               <div v-if="searchGroup.length">
                 <ul>
-                  <li class="item" v-for="it in searchGroup" :key="`${it.type}_${it.id}`">
+                  <li class="item" v-for="it in searchGroup" :key="`${it.type}_${it.id}`" @click="handleMember(it)">
                     <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
                     <p>{{ it.name }}</p>
                   </li>
@@ -80,6 +90,7 @@
         </ul>
       </div>
     </div>
+
     <div class="group dialog" v-show="visible.group">
       <div class="mask" @click="toggleGroup(false)"></div>
       <div class="content">
@@ -93,6 +104,22 @@
         </div>
       </div>
     </div>
+
+    <div class="friend dialog" v-show="friend">
+      <div class="mask" @click="friend = ''"></div>
+      <div class="content">
+        <div class="head">
+          <Avatar class="avatar" :userId="friend.id" :avatar="friend.avatar" />
+          <p>{{ friend.name }}</p>
+          <i class="icon icon-cancel-outline" @click="friend = ''"></i>
+        </div>
+        <div class="footer">
+          <button v-if="isInChat()" @click="handleSend">发送消息</button>
+          <button v-else @click="handleFriend">{{ friend.type === CHAT.USER ? '加为好友' : '加入群组' }}</button>
+        </div>
+      </div>
+    </div>
+
     <ul class="chat-list i-scroll">
       <li
         v-for="it in chatList"
@@ -128,6 +155,10 @@ export default {
       type: Object,
       defalt: () => {},
     },
+    userInfo: {
+      type: Object,
+      default: () => {},
+    },
     chatList: {
       type: Array,
       defalt: () => [],
@@ -143,10 +174,12 @@ export default {
   },
   data() {
     return {
+      CHAT,
       result: [],
       tab: 1,
       content: '',
       group: '',
+      friend: '',
     }
   },
   computed: {
@@ -164,10 +197,15 @@ export default {
     onFocus() {
       this.$emit('update:visible', { ...this.visible, search: true })
     },
-    handleClear() {
+    handleClear(focus = false) {
       this.content = ''
       this.result = []
-      this.$refs.searchInput.focus()
+      this.friend = ''
+      if (focus) {
+        this.$refs.searchInput.focus()
+      }
+      this.$emit('update:visible', { ...this.visible, search: focus })
+      this.$emit('update:searchResult', [])
     },
     toggleGroup(state) {
       this.group = ''
@@ -187,6 +225,27 @@ export default {
       if (search === '') return
       const msg = { command: CMD.SEARCH_REQUEST, data: { keyword: search } }
       this.$emit('handleRequestEvent', msg)
+    },
+    isInChat() {
+      return this.chatList.find((o) => o.type === this.friend.type && o.id === this.friend.id)
+    },
+    handleMember(it) {
+      this.friend = it
+    },
+    handleFriend() {
+      let msg
+      const id = this.friend.id
+      if (this.friend.type === CHAT.USER) {
+        msg = { command: CMD.ADD_FRIEND_REQUEST, data: { userId: id } }
+      } else {
+        msg = { command: CMD.JOIN_GROUP_REQUEST, data: { groupId: id } }
+      }
+      this.$emit('handleRequestEvent', msg)
+      this.handleClear(false)
+    },
+    handleSend() {
+      this.handleChat(this.friend)
+      this.handleClear(false)
     },
   },
 }

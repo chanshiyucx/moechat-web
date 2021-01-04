@@ -120,6 +120,7 @@
         </div>
       </div>
     </div>
+
     <div class="friend dialog" v-show="friend">
       <div class="mask" @click="friend = ''"></div>
       <div class="content">
@@ -427,7 +428,7 @@ export default {
       this.quit = state
     },
     handleQuit() {
-      const data = { id: this.chat.id }
+      const data = { groupId: this.chat.id }
       const msg = { command: CMD.QUIT_GROUP_REQUEST, data }
       this.$emit('handleRequestEvent', msg)
       this.quit = false

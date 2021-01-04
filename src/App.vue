@@ -10,9 +10,10 @@
       />
       <Group
         :visible.sync="visible"
+        :userInfo="userInfo"
         :chatList="chatList"
         :chat="chat"
-        :searchResult="searchResult"
+        :searchResult.sync="searchResult"
         @setChat="setChat"
         @handleRequestEvent="handleRequestEvent"
       />
