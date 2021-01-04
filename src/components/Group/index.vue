@@ -130,7 +130,12 @@
         <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
         <div>
           <div class="head">
-            <p class="name">{{ it.name }}</p>
+            <div>
+              <p class="name">{{ it.name }}</p>
+              <p v-if="it.type !== CHAT.USER" :class="['label', it.type === CHAT.CHANNEL && 'channel-label']">
+                {{ it.type === CHAT.CHANNEL ? '世界频道' : '群组' }}
+              </p>
+            </div>
             <p class="time">{{ it.updateTime | formatTime }}</p>
           </div>
           <div class="preview">

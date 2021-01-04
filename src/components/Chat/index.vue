@@ -21,7 +21,7 @@
               <LazyImg className="img-zoomable" :src="msg.message.url" @onload="scrollToBottom" />
             </div>
             <div v-else-if="msg.message.type === TYPES.INVITE" class="invite">
-              <p>【{{ chat.name }}】邀请你加入群组【{{ msg.message.text }}】</p>
+              <p>【{{ msg.nickname }}】邀请你加入群组【{{ msg.message.text }}】</p>
               <p class="join" @click="joinGroup(msg.message.id)">加入</p>
             </div>
           </div>
@@ -55,6 +55,7 @@
         </div>
         <input
           id="message-input"
+          ref="messageInput"
           type="text"
           v-model="message"
           placeholder="说点什么吧~"
@@ -384,6 +385,7 @@ export default {
     },
     handleEmoji(emoji) {
       this.message += [emoji.val]
+      this.$refs.messageInput.focus()
     },
     async uploadImage(event) {
       let file = event.target.files[0]

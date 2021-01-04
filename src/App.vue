@@ -346,7 +346,11 @@ export default {
         createTime: new Date(),
       }
       const key = `${this.chat.id}_${this.chat.type}`
-      this.chatMessage[key].push(localMsg)
+      if (!this.chatMessage[key]) {
+        this.chatMessage[key] = [localMsg]
+      } else {
+        this.chatMessage[key].push(localMsg)
+      }
 
       // 设置消息状态计数
       this.msgMq[data.index] = { type: message.type, count: 0 }

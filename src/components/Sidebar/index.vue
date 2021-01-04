@@ -13,7 +13,7 @@
         <i class="icon icon-info" @click="handleMenu('statistics')"></i>
         <span>关于</span>
       </li>
-      <li>
+      <li v-if="!userInfo.tourist">
         <i class="icon icon-off" @click="handleMenu('logout')"></i>
         <span>退出登录</span>
       </li>
