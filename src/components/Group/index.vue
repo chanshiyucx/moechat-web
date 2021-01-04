@@ -124,7 +124,7 @@
       <li
         v-for="it in chatList"
         :key="`${it.type}_${it.id}`"
-        @click="handleChat(it)"
+        @click="setChat(it)"
         :class="it.id === chat.id && it.type === chat.type ? 'active' : ''"
       >
         <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
@@ -134,7 +134,7 @@
             <p class="time">{{ it.updateTime | formatTime }}</p>
           </div>
           <div class="preview">
-            <p>摸鱼打卡</p>
+            <p>{{ lastMessage(it) }}</p>
           </div>
         </div>
       </li>
@@ -143,7 +143,7 @@
 </template>
 
 <script>
-import { CMD, CHAT } from '@/IM'
+import { CMD, TYPES, CHAT } from '@/IM'
 import Avatar from '../Avatar'
 import { validContent } from '@/utils'
 
@@ -166,6 +166,10 @@ export default {
     chat: {
       type: Object,
       defalt: () => {},
+    },
+    chatMessage: {
+      type: Object,
+      default: () => {},
     },
     searchResult: {
       type: Array,
@@ -191,8 +195,20 @@ export default {
     },
   },
   methods: {
-    handleChat(chat) {
+    setChat(chat) {
       this.$emit('setChat', chat)
+    },
+    lastMessage(chat) {
+      const key = `${chat.id}_${chat.type}`
+      const messageList = this.chatMessage[key] || []
+      const len = messageList.length
+      if (!len) return '暂无消息'
+      const message = messageList[len - 1].message
+      if (message.type === TYPES.PICTURE) {
+        return '[图片]'
+      } else {
+        return message.text
+      }
     },
     onFocus() {
       this.$emit('update:visible', { ...this.visible, search: true })
@@ -244,7 +260,7 @@ export default {
       this.handleClear(false)
     },
     handleSend() {
-      this.handleChat(this.friend)
+      this.setChat(this.friend)
       this.handleClear(false)
     },
   },

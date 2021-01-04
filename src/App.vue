@@ -13,6 +13,7 @@
         :userInfo="userInfo"
         :chatList="chatList"
         :chat="chat"
+        :chatMessage="chatMessage"
         :searchResult.sync="searchResult"
         @setChat="setChat"
         @handleRequestEvent="handleRequestEvent"
@@ -218,6 +219,16 @@ export default {
     },
     createGroupResponse(data) {
       this.visible.group = false
+      const { success, message, groupId } = data
+      if (data.success) {
+        this.$toasted.success(message)
+        const chat = this.chatList.find((o) => o.type === CHAT.GROUP && o.id === groupId)
+        if (chat) {
+          this.setChat(chat)
+        }
+      } else {
+        this.$toasted.error(message)
+      }
     },
     joinGroupResponse(data) {
       const { success, message, groupId } = data
@@ -225,7 +236,7 @@ export default {
         this.$toasted.success(message)
         const chat = this.chatList.find((o) => o.type === CHAT.GROUP && o.id === groupId)
         if (chat) {
-          this.chat = chat
+          this.setChat(chat)
         }
       } else {
         this.$toasted.error(message)
@@ -254,7 +265,7 @@ export default {
     chatMessageResponse(data) {
       if (data.id !== this.chat.id || data.type !== this.chat.type) return
       const key = `${this.chat.id}_${this.chat.type}`
-      const chatMessageList = this.chatMessage[key]
+      const chatMessageList = this.chatMessage[key] || []
       const seen = new Map()
       data.messageList.forEach((msg) => (msg.message = JSON.parse(msg.message)))
       const newChatMsg = data.messageList
@@ -306,6 +317,14 @@ export default {
     },
     setChat(chat) {
       this.chat = chat
+
+      // 如果当前会话没有缓存消息列表，则拉取最新消息
+      const key = `${chat.id}_${chat.type}`
+      const chatMessageList = this.chatMessage[key]
+      if (!chatMessageList) {
+        const msg = { command: CMD.CHAT_MESSAGE_REQUEST, data: { id: chat.id, type: chat.type, index: 0 } }
+        this.handleRequestEvent(msg)
+      }
     },
     async sendMessage(message, file) {
       if (!this.chat) return
