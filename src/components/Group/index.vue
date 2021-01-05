@@ -127,7 +127,10 @@
         @click="setChat(it)"
         :class="it.id === chat.id && it.type === chat.type ? 'active' : ''"
       >
-        <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
+        <div class="left">
+          <Avatar class="avatar" :userId="it.id" :avatar="it.avatar" />
+          <span v-if="it.type === CHAT.USER" :class="['dot', isOnline(it.id) && 'active']"></span>
+        </div>
         <div>
           <div class="head">
             <div>
@@ -180,6 +183,10 @@ export default {
       type: Array,
       defalt: () => [],
     },
+    onlineUser: {
+      type: Array,
+      defalt: () => [],
+    },
   },
   data() {
     return {
@@ -200,6 +207,9 @@ export default {
     },
   },
   methods: {
+    isOnline(id) {
+      return this.onlineUser.includes(id)
+    },
     setChat(chat) {
       this.$emit('setChat', chat)
     },

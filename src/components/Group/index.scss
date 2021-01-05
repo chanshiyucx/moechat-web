@@ -272,11 +272,17 @@
     li {
       display: flex;
       align-items: center;
-      padding: 10px 16px;
+      padding: 10px 12px;
       height: 90px;
       transition: background-color 0.2s;
       &.active {
         background-color: $primary-color-4;
+      }
+
+      .left {
+        position: relative;
+        flex-grow: 0;
+        font-size: 0;
       }
 
       .avatar {
@@ -285,9 +291,24 @@
         border-radius: 24px;
       }
 
+      .dot {
+        position: absolute;
+        bottom: -2px;
+        right: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: $failed;
+        border: 2px solid $primary-color-8;
+
+        &.active {
+          background-color: #5ed45c;
+        }
+      }
+
       > div {
         flex: 1;
-        margin-left: 12px;
+        margin-left: 8px;
 
         > div {
           display: flex;
@@ -297,6 +318,14 @@
         .head {
           margin-top: 2px;
           .name {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+            max-width: 80px;
+            text-overflow: ellipsis;
+            word-break: keep-all;
+            white-space: nowrap;
+            overflow: hidden;
             font-size: $font-size-base;
             color: $primary-text-color-10;
           }

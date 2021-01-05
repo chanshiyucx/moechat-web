@@ -15,6 +15,7 @@
         :chat="chat"
         :chatMessage="chatMessage"
         :searchResult.sync="searchResult"
+        :onlineUser="onlineUser"
         @setChat="setChat"
         @handleRequestEvent="handleRequestEvent"
       />
@@ -69,6 +70,7 @@ export default {
       msgMq: {},
       statistics: {},
       searchResult: [],
+      onlineUser: [],
     }
   },
   created() {
@@ -315,6 +317,9 @@ export default {
         this.statisticsTask()
       }, 1000)
     },
+    onlineUserResponse(data) {
+      this.onlineUser = data.onlineUser
+    },
     setChat(chat) {
       this.chat = chat
 
@@ -431,6 +436,9 @@ export default {
           if (data.close) {
             this.close()
           }
+          break
+        case CMD.ONLINE_USER_RESPONSE:
+          this.onlineUserResponse(data)
           break
         default:
           break
