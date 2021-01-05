@@ -10,6 +10,10 @@ import 'viewerjs/dist/viewer.css'
 
 Vue.config.productionTip = false
 
+// Switch
+import ToggleButton from 'vue-js-toggle-button'
+Vue.use(ToggleButton)
+
 // 桌面通知
 import Notification from '@/utils/notification'
 Vue.use(Notification)

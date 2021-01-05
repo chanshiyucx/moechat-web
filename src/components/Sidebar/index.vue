@@ -94,7 +94,33 @@
           <h3>设置</h3>
           <i class="icon icon-cancel-outline" @click="toggleSetting(false)"></i>
         </div>
-        <div class="body"></div>
+        <div class="body">
+          <div class="block">
+            <p>开关</p>
+            <div class="switch">
+              <div>
+                <span>桌面提醒</span>
+                <ToggleButton
+                  :value="setting.notice"
+                  :width="55"
+                  :labels="{ checked: 'ON', unchecked: 'OFF' }"
+                  color="rgba(5, 159, 149, 0.8)"
+                  @change="onNoticeChange"
+                />
+              </div>
+              <div>
+                <span>语音播报</span>
+                <ToggleButton
+                  :value="setting.sound"
+                  :width="55"
+                  :labels="{ checked: 'ON', unchecked: 'OFF' }"
+                  color="rgba(5, 159, 149, 0.8)"
+                  @change="onSoundChange"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -158,6 +184,12 @@ export default {
     },
     toggleSetting(state) {
       this.visible.setting = state
+    },
+    onNoticeChange(e) {
+      this.$emit('update:setting', { ...this.setting, notice: e.value })
+    },
+    onSoundChange(e) {
+      this.$emit('update:setting', { ...this.setting, sound: e.value })
     },
     handleUploading(form, xhr) {
       this.loading = true

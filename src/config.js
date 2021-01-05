@@ -7,11 +7,11 @@ if (!isDev) {
 
 let baseURL, imURL
 if (isDev) {
-  baseURL = 'http://192.168.10.25:8000'
-  imURL = 'ws://192.168.10.25:8002/chat'
+  baseURL = 'http://192.168.100.147:8000'
+  imURL = 'ws://192.168.100.147:8002/chat'
 } else {
-  baseURL = 'http://192.168.10.25:8000'
-  imURL = 'ws://192.168.10.25:8002/chat'
+  baseURL = 'http://192.168.100.147:8000'
+  imURL = 'ws://192.168.100.147:8002/chat'
 }
 
 export default {

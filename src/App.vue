@@ -86,7 +86,8 @@ export default {
   },
   watch: {
     setting(val) {
-      this.localSave('setting', val)
+      console.log('val--', val)
+      localSave('setting', JSON.stringify(val))
     },
   },
   created() {
