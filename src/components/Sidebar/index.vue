@@ -13,6 +13,10 @@
         <i class="icon icon-info" @click="handleMenu('statistics')"></i>
         <span>关于</span>
       </li>
+      <li>
+        <i class="icon icon-cog" @click="handleMenu('setting')"></i>
+        <span>设置</span>
+      </li>
       <li v-if="!userInfo.tourist">
         <i class="icon icon-off" @click="handleMenu('logout')"></i>
         <span>退出登录</span>
@@ -82,6 +86,17 @@
         </div>
       </div>
     </div>
+
+    <div class="setting dialog" v-show="visible.setting">
+      <div class="mask" @click="toggleSetting(false)"></div>
+      <div class="content">
+        <div class="head">
+          <h3>设置</h3>
+          <i class="icon icon-cancel-outline" @click="toggleSetting(false)"></i>
+        </div>
+        <div class="body"></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -108,12 +123,17 @@ export default {
       type: Object,
       default: () => {},
     },
+    setting: {
+      type: Object,
+      default: () => {},
+    },
   },
   data() {
     return {
       visible: {
         edit: false,
         statistics: false,
+        setting: false,
       },
       loading: false,
       avatar: '',
@@ -135,6 +155,9 @@ export default {
     },
     toggleStatittics(state) {
       this.visible.statistics = state
+    },
+    toggleSetting(state) {
+      this.visible.setting = state
     },
     handleUploading(form, xhr) {
       this.loading = true
@@ -204,6 +227,9 @@ export default {
         case 'statistics':
           this.handleStatistics()
           break
+        case 'setting':
+          this.handleSetting()
+          break
         case 'logout':
           this.$emit('logout')
           break
@@ -215,6 +241,9 @@ export default {
       const msg = { command: CMD.STATISTICS_REQUEST, data: {} }
       this.$emit('handleRequestEvent', msg)
       this.visible.statistics = true
+    },
+    handleSetting() {
+      this.visible.setting = true
     },
   },
 }

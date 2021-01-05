@@ -10,6 +10,10 @@ import 'viewerjs/dist/viewer.css'
 
 Vue.config.productionTip = false
 
+// 桌面通知
+import Notification from '@/utils/notification'
+Vue.use(Notification)
+
 // 全局时间格式化过滤器
 Vue.filter('formatTime', (time) => {
   const messageTime = new Date(time)

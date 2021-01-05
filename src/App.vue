@@ -5,6 +5,7 @@
         :online="online"
         :userInfo="userInfo"
         :statistics="statistics"
+        :setting.sync="setting"
         @logout="logout"
         @handleRequestEvent="handleRequestEvent"
       />
@@ -36,13 +37,21 @@
 
 <script>
 import config from './config'
-import IM, { CMD, CHAT } from '@/IM'
+import IM, { CMD, TYPES, CHAT } from '@/IM'
 import Sidebar from '@/components/Sidebar'
 import Group from '@/components/Group'
 import Chat from '@/components/Chat'
 import Panel from '@/components/Panel'
 import { getWidthPercent, getHeightPercent, getDeviceInfo } from '@/utils/device'
 import { localSave, localRead, localRemove, diffTime } from '@/utils'
+
+const defaultSetting = { notice: true, sound: true }
+let localSetting = localRead('setting')
+try {
+  localSetting = localSetting ? JSON.parse(localSetting) : defaultSetting
+} catch (error) {
+  localSetting = defaultSetting
+}
 
 export default {
   name: 'App',
@@ -60,7 +69,9 @@ export default {
         search: false,
         group: false,
       },
+      setting: localSetting,
       online: false,
+      pageFocus: true,
       userInfo: {},
       chatList: [],
       chat: {},
@@ -72,6 +83,11 @@ export default {
       searchResult: [],
       onlineUser: [],
     }
+  },
+  watch: {
+    setting(val) {
+      this.localSave('setting', val)
+    },
   },
   created() {
     this.init()
@@ -94,12 +110,14 @@ export default {
   mounted() {
     window.addEventListener('resize', this.handleResize)
     document.addEventListener('click', this.handleClick)
+    document.addEventListener('visibilitychange', this.handleVisibilityChange)
 
     this.msgTask()
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.handleResize)
     document.removeEventListener('click', this.handleClick)
+    document.addEventListener('visibilitychange', this.handleVisibilityChange)
   },
   methods: {
     handleResize() {
@@ -135,6 +153,9 @@ export default {
         this.visible.search = false
       }
     },
+    handleVisibilityChange() {
+      this.pageFocus = !document.hidden
+    },
     msgTask() {
       setTimeout(() => {
         const newMq = {}
@@ -148,6 +169,20 @@ export default {
         this.msgMq = newMq
         this.msgTask()
       }, 1000)
+    },
+    notice(title, message) {
+      if (this.pageFocus) return
+      if (this.setting.notice) {
+        this.$notification(title, {
+          body: message,
+          icon: 'static/favicon.png',
+        })
+      }
+      if (this.setting.sound) {
+        const text = `${title} ${message}`
+        const speechInstance = new window.SpeechSynthesisUtterance(text)
+        window.speechSynthesis.speak(speechInstance)
+      }
     },
     init() {
       this.ImSocket = new IM({
@@ -206,6 +241,16 @@ export default {
         const length = this.chatList.filter((o) => o.type === CHAT.CHANNEL).length
         this.chatList.splice(length, 1, chat)
       }
+
+      let title
+      if (data.type === CHAT.USER) {
+        title = `${data.nickname} 对你说：`
+      } else {
+        const target = this.chatList.find((o) => o.type === data.type && o.id === data.receiver)
+        title = `${data.nickname} 在 ${target.name} 对大家说：`
+      }
+      const message = data.message.type === TYPES.PICTURE ? '[图片]' : data.message.text
+      this.notice(title, message)
     },
     addFriendResponse(data) {
       const { success, message, userId } = data
@@ -452,6 +497,7 @@ export default {
 #app {
   background-image: url('./assets/images/bg.jpg');
   background-repeat: no-repeat;
+  background-size: cover;
 
   > div {
     position: absolute;
