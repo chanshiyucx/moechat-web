@@ -8,7 +8,7 @@
   justify-content: space-between;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
-  background-color: $primary-color-8;
+  background-color: $primary-color-deep;
 
   .header {
     position: relative;
@@ -30,7 +30,7 @@
       height: 16px;
       border-radius: 50%;
       background-color: $failed;
-      border: 2px solid $primary-color-8;
+      border: 2px solid $primary-color-deep;
 
       &.active {
         background-color: #5ed45c;
@@ -134,9 +134,9 @@
           width: 90px;
           height: 32px;
           font-size: 14px;
-          color: $primary-text-color-10;
+          color: #fff;
           border-radius: 4px;
-          background-color: $primary-color-8_5;
+          background-color: $primary-color-deep;
         }
 
         .avatar {
@@ -159,7 +159,7 @@
           border: 1px solid rgba(0, 0, 0, 0.2);
 
           &:focus {
-            border: 1px solid $primary-color-5_5;
+            border: 1px solid $primary-color-dark;
           }
         }
       }
@@ -187,6 +187,10 @@
   }
 
   .setting {
+    .content {
+      width: 600px;
+    }
+
     .body {
       p {
         margin-bottom: 4px;
@@ -218,6 +222,52 @@
 
           .vue-js-switch .v-switch-label {
             line-height: 23px !important;
+          }
+        }
+      }
+
+      .theme {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+
+        > li {
+          > div {
+            position: relative;
+            display: flex;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+
+            &.active {
+              &::before {
+                content: '';
+                position: absolute;
+                top: -4px;
+                right: -4px;
+                bottom: -4px;
+                left: -4px;
+                border-radius: 5px;
+                border: $primary-color-deep solid 5px;
+                transition-duration: 0.3s;
+                transition-property: transform border;
+              }
+
+              &:hover::before {
+                transform: scale(1.05, 1.1);
+              }
+            }
+          }
+
+          img {
+            width: 176px;
+            height: 96px;
+            object-fit: cover;
+          }
+
+          p {
+            margin-top: 14px;
+            text-align: center;
           }
         }
       }

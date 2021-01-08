@@ -120,6 +120,17 @@
               </div>
             </div>
           </div>
+          <div class="block">
+            <p>主题</p>
+            <ul class="theme">
+              <li v-for="th in themeList" :key="th.name" @click="setTheme(th)">
+                <div :class="th.name === theme.name && 'active'">
+                  <img :src="th.src" />
+                </div>
+                <p>{{ th.name }}</p>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -153,6 +164,14 @@ export default {
       type: Object,
       default: () => {},
     },
+    themeList: {
+      type: Array,
+      default: () => [],
+    },
+    theme: {
+      type: Object,
+      default: () => {},
+    },
   },
   data() {
     return {
@@ -176,6 +195,9 @@ export default {
     },
   },
   methods: {
+    setTheme(theme) {
+      this.$emit('update:theme', theme)
+    },
     toggleEdit(state) {
       this.visible.edit = state
     },

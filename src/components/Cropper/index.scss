@@ -59,7 +59,7 @@
         font-size: 15px;
         letter-spacing: 1px;
         &:hover {
-          background-color: $primary-color-8_5;
+          background-color: $primary-color-deep;
           color: #fff;
         }
       }
@@ -67,12 +67,12 @@
   }
 
   .cropper-view-box {
-    outline: 1px solid $primary-color-8;
-    outline-color: $primary-color-8_5;
+    outline: 1px solid $primary-color-deep;
+    outline-color: $primary-color-deep;
   }
 
   .cropper-line,
   .cropper-point {
-    background-color: $primary-color-8_5;
+    background-color: $primary-color-deep;
   }
 }

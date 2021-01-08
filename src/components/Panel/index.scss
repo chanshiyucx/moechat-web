@@ -42,7 +42,7 @@
       position: absolute;
       width: 2px;
       height: 150%;
-      background-color: $primary-color-5;
+      background-color: $primary-color-dark;
     }
   }
 
@@ -69,7 +69,7 @@
         bottom: -4px;
         width: 10px;
         height: 10px;
-        background-color: $primary-color-5;
+        background-color: $primary-color-dark;
         border-radius: 50%;
       }
     }
@@ -97,7 +97,7 @@
       height: 50px;
       box-sizing: border-box;
       border-radius: 12px 12px 0 0;
-      border-bottom: 1px solid $primary-color-5;
+      border-bottom: 1px solid $primary-color-dark;
       background-color: $panel-bg-color;
 
       .inner {
@@ -105,7 +105,7 @@
         width: 85%;
         font-size: 20px;
         line-height: 50px;
-        color: $primary-color-5;
+        color: $primary-color-dark;
         letter-spacing: 1px;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -145,7 +145,7 @@
           outline: none;
 
           &:focus {
-            border: 1px solid $primary-color-5_5;
+            border: 1px solid $primary-color-dark;
           }
         }
       }
@@ -156,7 +156,7 @@
       width: 100%;
       height: 50px;
       border-radius: 0 0 12px 12px;
-      border-top: 1px solid $primary-color-5;
+      border-top: 1px solid $primary-color-dark;
       background-color: $panel-bg-color;
 
       button {
@@ -172,13 +172,13 @@
         overflow: hidden;
         border-style: none;
         border-radius: 30px;
-        box-shadow: $primary-color-8 0px 0px 10px;
-        background-color: $primary-color-8;
+        box-shadow: $primary-color-deep 0px 0px 10px;
+        background-color: $primary-color-deep;
         transform: translate(-50%, 50%);
         transition: all 0.5s cubic-bezier(0.86, -0.02, 0.08, 1.02) 0s;
 
         &:hover {
-          box-shadow: $primary-color-8 0px 0px 10px;
+          box-shadow: $primary-color-deep 0px 0px 10px;
           &::before {
             transform: translateX(0px);
           }
@@ -196,7 +196,7 @@
           border-radius: 30px;
         }
         &::before {
-          background-color: $primary-color-5;
+          background-color: $primary-color-dark;
           transform: translateX(-100%);
           transition: all 0.5s cubic-bezier(0.86, -0.02, 0.08, 1.02) 0s;
         }

@@ -1,11 +1,13 @@
 <template>
-  <div id="app">
+  <div id="app" :style="bgStyle">
     <div :style="chatStyle">
       <Sidebar
         :online="online"
         :userInfo="userInfo"
         :statistics="statistics"
         :setting.sync="setting"
+        :themeList="themeList"
+        :theme.sync="theme"
         @logout="logout"
         @handleRequestEvent="handleRequestEvent"
       />
@@ -53,11 +55,22 @@ try {
   localSetting = defaultSetting
 }
 
+const themeList = [
+  { id: 'forest', name: '静谧之森', src: require('@/assets/images/forest.jpg') },
+  { id: 'miku', name: '世界歌姬', src: require('@/assets/images/miku.jpg') },
+  { id: 'touhou', name: '千年幻想', src: require('@/assets/images/touhou.jpg') },
+]
+const localTheme = localRead('theme')
+const theme = themeList.find((o) => o.id === localTheme) || themeList[0]
+
 export default {
   name: 'App',
   components: { Sidebar, Group, Chat, Panel },
   data() {
     return {
+      themeList,
+      theme,
+      setting: localSetting,
       ImSocket: null,
       device: getDeviceInfo(),
       width: getWidthPercent(),
@@ -69,7 +82,6 @@ export default {
         search: false,
         group: false,
       },
-      setting: localSetting,
       online: false,
       pageFocus: true,
       userInfo: {},
@@ -86,14 +98,19 @@ export default {
   },
   watch: {
     setting(val) {
-      console.log('val--', val)
       localSave('setting', JSON.stringify(val))
+    },
+    theme(val) {
+      localSave('theme', val.id)
     },
   },
   created() {
     this.init()
   },
   computed: {
+    bgStyle() {
+      return `background-image: url(${this.theme.src});`
+    },
     chatStyle() {
       return {
         width: `${this.width * 100}%`,
@@ -496,9 +513,9 @@ export default {
 
 <style lang="scss" scope>
 #app {
-  background-image: url('./assets/images/bg.jpg');
   background-repeat: no-repeat;
   background-size: cover;
+  background-position: center;
 
   > div {
     position: absolute;
